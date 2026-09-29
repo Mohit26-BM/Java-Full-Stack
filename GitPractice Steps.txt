@@ -1,0 +1,78 @@
+1. move to the directory 
+   cd <directory name>
+
+2. git init
+
+3. git add <filenames> / .
+
+4. git commit -m "commit message"
+
+5. git branch -M <branchname>  (main)
+
+6. git remote add origin <githuburl>
+
+7. git push origin <branchname> (main)
+
+
+8. add few more files to the same <directoryname>
+
+9. git status
+
+(This will show all the files which are added but not moved to staging dir in red color)
+
+10. git add . / <filename>
+
+
+11. git status
+
+(This will show all the files in the staging in green color)
+
+12. git commit -m "commit message"
+
+13. git push origin <branchname> (main)
+
+
+14. create a new branch
+
+    git branch -M <branchname> (dev)
+
+15. git branch
+(list all the branches with * for active branch)
+
+
+16. add some files to the working directory
+
+17. git add .
+
+18. git commit -m "added few files to dev branch"
+
+19. git push origin dev 
+
+20. examine the files in the GitLab for main and dev branches, 
+    updated contents must be pushed only in the dev branch
+
+
+21. git branch -b main
+
+22. git branch
+
+(this will show active branch as main)
+
+23. git merge dev
+
+24. git add .
+
+25. git commit -m "merged dev branch with main"
+
+26. git push origin main
+
+27. verify both main and dev branches in GitLab, such that both must contain
+     same code
+
+
+
+
+
+
+
+
