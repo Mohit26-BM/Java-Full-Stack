@@ -1,0 +1,201 @@
+Lambda Expression - It is an anonymous methods without having
+1. name of the method
+2. return type of the method
+3. access specifier of the method
+
+public int add(int a, int b){
+	return a+b;
+}
+
+(int a, int b) -> {
+	return a+b;
+}
+
+Simplied:
+1.  In lambda expression datatype for parameters are not required
+
+
+(a,b) -> {
+
+	return a+b;
+}
+
+2. Paranethesis is not required if there is only one line in the block
+
+(a,b) -> return a+b;
+
+3. In lambda expressions if there is only one return statement, then return keyword is also
+not required
+
+(a,b) -> a+b;
+
+
+public Boolean check(int n){
+	if (n%2==0)
+		return true;
+	else
+		return false;
+}
+
+(n) -> {
+	if (n%2==0)
+		return true;
+	else
+		return false;
+}
+
+
+
+
+(n) -> {  n%2==0  }
+
+(n) -> n%2==0;
+
+4. if there is only one parameter then () also not required
+
+ n -> n%2==0;
+
+
+public int fact(int n){
+	int f=1;
+	for(int i=1;i<=n;i++)
+		f=f*i;
+	return f;
+}
+
+
+n -> {
+	int f=1;
+	for(int i=1;i<=n;i++)
+		f=f*i;
+	return f;
+}
+
+
+Lambda expressions are used to implement functional interfaces
+
+Functional Interfaces are those interfaces which has only one abstract method
+
+
+interface Maths{
+	int add(int a, int b);
+	
+}
+
+Maths is called functional interface
+
+
+Runnable
+
+Clonenable
+
+
+Utility Functional interfaces
+----------------------------
+
+class Util{
+	public Boolean isEven(int n){
+		if(n%2==0)
+			return true;
+		else
+			return false;
+	}
+
+	public Boolean isPrime(int n){
+		//logic for checing prime
+		return true if prime else return false;
+	}
+
+	public int fact(int x){
+		//write code for factorial 
+		return f;
+	}
+
+	public int countVowels(String word){
+		//write code to count vowels
+		return count;
+	}
+
+}
+
+Utils utils = new Utils();
+sop(utils.isEven(10));
+
+
+predefined utility functional interfaces
+-------------------------------------------
+1. Predicate
+2. Function
+3. Consumer
+4. Supplier
+5. BiPredicate
+6. BiFunction
+7. BiConsumer
+
+Predicate - It is a functional interface with only one method "test",
+it will take one argument of any datatype but returs only Boolean
+
+
+@FunctionInterface
+public interface Predicate<T>{
+	public Boolean test(T t);
+}
+
+@FunctionalInterface
+public interface Maths{
+	public int add(int a,, int b);
+}
+
+Maths  m = (a,b) -> a+b;
+sop(m.add(10,20));
+
+Predicate<Integer> p1 = x -> x%2==0;
+Predicate<Integer> p2 = y -> y>=20;
+Predicate<String> p3 = str -> str.length()>=10;
+
+sop(p1.test(10));
+sop(p1.test(15));
+sop(p2.test(20));
+sop(p2.test(10));
+sop(p3.test("Hello"));
+sop(p3.test("Programming in java"));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

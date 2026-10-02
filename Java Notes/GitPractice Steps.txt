@@ -1,0 +1,216 @@
+Microsoft Windows [Version 10.0.26200.9168]
+(c) Microsoft Corporation. All rights reserved.
+
+D:\CSB_Training>git init
+Initialized empty Git repository in D:/CSB_Training/.git/
+
+D:\CSB_Training>git add .
+
+D:\CSB_Training>git commit -m "Added Assignment 1"
+[master (root-commit) 1acbb4f] Added Assignment 1
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 Day 001/Assignment 1_ E-Commerce Mobile Application.pdf
+
+D:\CSB_Training>git branch -M main
+
+D:\CSB_Training>got remote add origin https://gitlab.stackroute.in/mbmohyal54548/csb-training-mohit.git
+'got' is not recognized as an internal or external command,
+operable program or batch file.
+
+D:\CSB_Training>git remote add origin https://gitlab.stackroute.in/mbmohyal54548/csb-training-mohit.git
+
+D:\CSB_Training>git push origin main
+warning: missing OAuth configuration for gitlab.stackroute.in - see https://aka.ms/gcm/gitlab for more information
+remote: HTTP Basic: Access denied. The provided password or token is incorrect or your account has 2FA enabled and you must use a personal access token instead of a password. See https://gitlab.stackroute.in/help/topics/git/troubleshooting_git#error-on-git-fetch-http-basic-access-denied
+fatal: Authentication failed for 'https://gitlab.stackroute.in/mbmohyal54548/csb-training-mohit.git/'
+
+D:\CSB_Training>git push origin main
+warning: missing OAuth configuration for gitlab.stackroute.in - see https://aka.ms/gcm/gitlab for more information
+remote: HTTP Basic: Access denied. The provided password or token is incorrect or your account has 2FA enabled and you must use a personal access token instead of a password. See https://gitlab.stackroute.in/help/topics/git/troubleshooting_git#error-on-git-fetch-http-basic-access-denied
+fatal: Authentication failed for 'https://gitlab.stackroute.in/mbmohyal54548/csb-training-mohit.git/'
+
+D:\CSB_Training>git push origin main
+warning: missing OAuth configuration for gitlab.stackroute.in - see https://aka.ms/gcm/gitlab for more information
+To https://gitlab.stackroute.in/mbmohyal54548/csb-training-mohit.git
+ ! [rejected]        main -> main (fetch first)
+error: failed to push some refs to 'https://gitlab.stackroute.in/mbmohyal54548/csb-training-mohit.git'
+hint: Updates were rejected because the remote contains work that you do not
+hint: have locally. This is usually caused by another repository pushing to
+hint: the same ref. If you want to integrate the remote changes, use
+hint: 'git pull' before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+
+D:\CSB_Training>git pull origin main --allow-unrelated-histories
+remote: Enumerating objects: 3, done.
+remote: Counting objects: 100% (3/3), done.
+remote: Compressing objects: 100% (2/2), done.
+remote: Total 3 (delta 0), reused 0 (delta 0), pack-reused 0
+Unpacking objects: 100% (3/3), 2.80 KiB | 204.00 KiB/s, done.
+From https://gitlab.stackroute.in/mbmohyal54548/csb-training-mohit
+ * branch            main       -> FETCH_HEAD
+ * [new branch]      main       -> origin/main
+Merge made by the 'ort' strategy.
+ README.md | 92 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 92 insertions(+)
+ create mode 100644 README.md
+
+D:\CSB_Training>git push origin main
+Enumerating objects: 7, done.
+Counting objects: 100% (7/7), done.
+Delta compression using up to 12 threads
+Compressing objects: 100% (5/5), done.
+Writing objects: 100% (6/6), 115.45 KiB | 8.25 MiB/s, done.
+Total 6 (delta 0), reused 0 (delta 0), pack-reused 0 (from 0)
+To https://gitlab.stackroute.in/mbmohyal54548/csb-training-mohit.git
+   aea50cb..2606810  main -> main
+
+D:\CSB_Training>git statud
+git: 'statud' is not a git command. See 'git --help'.
+
+The most similar command is
+        status
+
+D:\CSB_Training>git status
+On branch main
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        GitPractice Steps.txt
+
+nothing added to commit but untracked files present (use "git add" to track)
+
+D:\CSB_Training>git add .
+
+D:\CSB_Training>git status
+On branch main
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+        new file:   GitPractice Steps.txt
+
+
+D:\CSB_Training>git commit -m "Added a temporary file"
+[main 44da2c1] Added a temporary file
+ 1 file changed, 78 insertions(+)
+ create mode 100644 GitPractice Steps.txt
+
+D:\CSB_Training>git push origin main
+Enumerating objects: 4, done.
+Counting objects: 100% (4/4), done.
+Delta compression using up to 12 threads
+Compressing objects: 100% (3/3), done.
+Writing objects: 100% (3/3), 841 bytes | 420.00 KiB/s, done.
+Total 3 (delta 0), reused 0 (delta 0), pack-reused 0 (from 0)
+To https://gitlab.stackroute.in/mbmohyal54548/csb-training-mohit.git
+   2606810..44da2c1  main -> main
+
+D:\CSB_Training>git branch -M Temp
+
+D:\CSB_Training>git branch
+* Temp
+
+D:\CSB_Training>git add .
+
+D:\CSB_Training>git commit -m "added few files to the temp file"
+[Temp 450ae8d] added few files to the temp file
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 Progressive_Banking_Project_Description.pdf
+
+D:\CSB_Training>git push origin Temp
+Enumerating objects: 4, done.
+Counting objects: 100% (4/4), done.
+Delta compression using up to 12 threads
+Compressing objects: 100% (3/3), done.
+Writing objects: 100% (3/3), 404.35 KiB | 10.37 MiB/s, done.
+Total 3 (delta 0), reused 0 (delta 0), pack-reused 0 (from 0)
+remote:
+remote: To create a merge request for Temp, visit:
+remote:   https://gitlab.stackroute.in/mbmohyal54548/csb-training-mohit/-/merge_requests/new?merge_request%5Bsource_branch%5D=Temp
+remote:
+To https://gitlab.stackroute.in/mbmohyal54548/csb-training-mohit.git
+ * [new branch]      Temp -> Temp
+
+D:\CSB_Training>git branch -b main
+error: unknown switch `b'
+usage: git branch [<options>] [-r | -a] [--merged] [--no-merged]
+   or: git branch [<options>] [-f] [--recurse-submodules] <branch-name> [<start-point>]
+   or: git branch [<options>] [-l] [<pattern>...]
+   or: git branch [<options>] [-r] (-d | -D) <branch-name>...
+   or: git branch [<options>] (-m | -M) [<old-branch>] <new-branch>
+   or: git branch [<options>] (-c | -C) [<old-branch>] <new-branch>
+   or: git branch [<options>] [-r | -a] [--points-at]
+   or: git branch [<options>] [-r | -a] [--format]
+
+Generic options
+    -v, --[no-]verbose    show hash and subject, give twice for upstream branch
+    -q, --[no-]quiet      suppress informational messages
+    -t, --[no-]track[=(direct|inherit)]
+                          set branch tracking configuration
+    -u, --[no-]set-upstream-to <upstream>
+                          change the upstream info
+    --[no-]unset-upstream unset the upstream info
+    --[no-]color[=<when>] use colored output
+    -r, --remotes         act on remote-tracking branches
+    --contains <commit>   print only branches that contain the commit
+    --no-contains <commit>
+                          print only branches that don't contain the commit
+    --[no-]abbrev[=<n>]   use <n> digits to display object names
+
+Specific git-branch actions:
+    -a, --all             list both remote-tracking and local branches
+    -d, --[no-]delete     delete fully merged branch
+    -D                    delete branch (even if not merged)
+    -m, --[no-]move       move/rename a branch and its reflog
+    -M                    move/rename a branch, even if target exists
+    --[no-]omit-empty     do not output a newline after empty formatted refs
+    -c, --[no-]copy       copy a branch and its reflog
+    -C                    copy a branch, even if target exists
+    -l, --[no-]list       list branch names
+    --[no-]show-current   show current branch name
+    --[no-]create-reflog  create the branch's reflog
+    --[no-]edit-description
+                          edit the description for the branch
+    -f, --[no-]force      force creation, move/rename, deletion
+    --merged <commit>     print only branches that are merged
+    --no-merged <commit>  print only branches that are not merged
+    --[no-]column[=<style>]
+                          list branches in columns
+    --[no-]sort <key>     field name to sort on
+    --[no-]points-at <object>
+                          print only branches of the object
+    -i, --[no-]ignore-case
+                          sorting and filtering are case insensitive
+    --[no-]recurse-submodules
+                          recurse through submodules
+    --[no-]format <format>
+                          format to use for the output
+
+
+D:\CSB_Training>git switch main
+branch 'main' set up to track 'origin/main'.
+Switched to a new branch 'main'
+
+D:\CSB_Training>git branch
+  Temp
+* main
+
+D:\CSB_Training>git merge Temp
+Updating 44da2c1..450ae8d
+Fast-forward
+ Progressive_Banking_Project_Description.pdf | Bin 0 -> 480222 bytes
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 Progressive_Banking_Project_Description.pdf
+
+D:\CSB_Training>git add .
+
+D:\CSB_Training>git commit -m "Merged the Temp branch with main"
+On branch main
+Your branch is ahead of 'origin/main' by 1 commit.
+  (use "git push" to publish your local commits)
+
+nothing to commit, working tree clean
+
+D:\CSB_Training>git push origin main
+Total 0 (delta 0), reused 0 (delta 0), pack-reused 0 (from 0)
+To https://gitlab.stackroute.in/mbmohyal54548/csb-training-mohit.git
+   44da2c1..450ae8d  main -> main
+
+D:\CSB_Training>

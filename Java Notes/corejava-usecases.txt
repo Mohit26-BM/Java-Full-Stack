@@ -1,0 +1,101 @@
+1. ATM Transaction Validation
+
+A bank wants to develop a simple ATM transaction program. The user enters their account balance and the amount they want to withdraw. The system should verify whether the withdrawal amount is valid.
+
+The withdrawal amount must be greater than zero and should not exceed the available account balance. If the withdrawal is successful, the system should display the withdrawn amount and the remaining balance. If the user does not have sufficient funds, an appropriate message should be displayed.
+
+Trainee should determine:
+
+Required variables
+Conditions
+Validation logic
+Appropriate if-else statements
+2. Electricity Bill Calculation
+
+An electricity provider wants a simple program to calculate a customer's monthly electricity bill based on the number of units consumed.
+
+The billing rules are:
+
+First 100 units → ₹2 per unit
+Next 100 units → ₹3 per unit
+Next 200 units → ₹5 per unit
+Above 400 units → ₹7 per unit
+
+The program should accept the number of units consumed and calculate the total bill.
+
+Trainee should determine:
+
+How to divide the consumption into slabs
+Conditional logic
+Arithmetic calculations
+Handling different consumption ranges
+3. Employee Salary Processing
+
+A company wants to develop a simple salary-processing program. The system should accept an employee's basic salary and calculate the employee's gross salary.
+
+The company provides:
+
+HRA = 20% of basic salary
+DA = 10% of basic salary
+Transport allowance = ₹2,000
+
+However, employees whose basic salary is less than ₹30,000 receive a special transport allowance of ₹3,000.
+
+The program should display the basic salary, allowances, and final gross salary.
+
+Trainee should determine:
+
+Variables and calculations
+Percentage calculation
+Conditional logic
+Output formatting
+4. Bank Loan Eligibility
+
+A bank wants to create a simple loan eligibility-checking system.
+
+The customer provides:
+
+Age
+Monthly salary
+Credit score
+Existing monthly loan EMI
+
+A customer can apply for the loan only if:
+
+Age is between 21 and 60
+Monthly salary is at least ₹30,000
+Credit score is at least 700
+Existing EMI is not more than 40% of monthly salary
+
+The system should display whether the customer is eligible and, if not eligible, indicate the reason.
+
+Trainee should determine:
+
+Multiple conditions
+Logical operators (&&, ||)
+Nested/combined if-else
+Percentage calculations
+5. ATM PIN Security
+
+A bank wants to implement a basic PIN verification system for an ATM.
+
+The customer has a predefined 4-digit PIN. The system should allow the customer to enter the PIN. The customer gets a maximum of 3 attempts to enter the correct PIN.
+
+If the correct PIN is entered, display:
+
+PIN verified successfully.
+Welcome to the ATM.
+
+If the customer enters the wrong PIN three times, display:
+
+Maximum attempts exceeded.
+Your account has been temporarily locked.
+
+Trainee should determine:
+
+while or for loop
+if-else
+Counter variable
+User input
+Combining loop and conditional logic
+Best progression for trainees

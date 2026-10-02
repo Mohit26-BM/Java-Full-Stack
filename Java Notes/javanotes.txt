@@ -1,0 +1,31 @@
+Points to remember
+
+1. All objects will have individual memory space to non static variables.
+2. All objects will have only one copy of methods
+3. A static variable will have only one copy, all variables will share the same copy
+4. A non static variable or method can be access only through objects
+5. A static method can be called directly on the class name
+6. A static mehod can access only static variables.
+7. A non static method can access both static and non static variables
+
+8. Every class is created with the help of a constructor
+9. A constructor is a special method which will be automatically called when ever the object
+   is created.
+10. A class can have either parameterized or default constructors
+11. A default constructor can be give either by java or user
+12. Java will assign one empty default constructor only when the class doesnot have any type of
+    constructor
+13. A parameterized constructor should be give by the user only
+14. We can choose which type of constructor to be used for creating the object
+15. this is a constant which will store the reference of the current object
+16. when method variable name and instance variable names are same, to distinguish
+    the instance variables are to be reference with this.variablename
+ this.
+17. this() - this method is used to create a object by using more than one constructor
+
+this() is used to call one constructor in another constructor
+
+18. this() must be called only in constructor
+19. this() must be the first line the constructor
+20. this() should not form a cycle
+
