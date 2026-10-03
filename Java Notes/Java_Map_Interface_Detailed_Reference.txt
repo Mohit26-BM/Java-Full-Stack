@@ -1,0 +1,1542 @@
+1D -> Objects --> just values in the memory
+
+
+
+JAVA MAP INTERFACE — DETAILED REFERENCE
+
+1. INTRODUCTION
+
+The Map interface is part of the java.util package.
+
+A Map stores data in the form of KEY-VALUE pairs.
+
+Example:
+
+    101 -> "Praveen"
+    102 -> "Ravi"
+    103 -> "Kiran"
+    104 -> "Ravi"
+
+Keys and values must be Objects --> you cannot primitive
+Key and values can be any object including List, set or queue
+
+
+
+Here: 101, 102, 103 are keys “Praveen”, “Ravi”, “Kiran” are values
+
+A key is normally used to uniquely identify a value.
+
+Important characteristics:
+
+-   A Map stores key-value pairs.
+-   Keys are unique.
+-   A key can map to at most one value.
+-   Multiple keys can have the same value.
+-   Whether null keys/values are allowed depends on the implementation.
+-   Map is an interface, not a class.
+-   Map does not extend the Collection interface.
+-   Common implementations include: HashMap LinkedHashMap TreeMap
+    Hashtable ConcurrentHashMap
+
+Package:
+
+    import java.util.Map;
+
+2. MAP INTERFACE HIERARCHY
+
+                    Map<K,V>
+                       |
+        ---------------------------------
+        |               |               |
+     HashMap      LinkedHashMap      TreeMap
+
+Other important implementations:
+
+    Hashtable
+    ConcurrentHashMap
+    EnumMap
+    WeakHashMap
+    IdentityHashMap
+
+K = type of key V = type of value
+
+Example:
+
+    Map<Integer, String> students = new HashMap<>();
+
+3. BASIC MAP EXAMPLE
+
+    import java.util.*;
+
+    public class MapDemo {
+        public static void main(String[] args) {
+
+            Map<Integer, String> students = new HashMap<>();
+
+            students.put(101, "Praveen");  // (key,value) is called entry
+					  // is a collection of entries 
+            students.put(102, "Ravi");
+            students.put(103, "Kiran");
+
+            System.out.println(students);
+        }
+    }
+
+Possible output:
+
+    {101=Praveen, 102=Ravi, 103=Kiran}
+
+The exact order should not be assumed for HashMap.
+
+4. GENERIC SYNTAX
+
+    Map<K, V> map = new HashMap<>();
+
+Example:
+
+    Map<Integer, String> employees = new HashMap<>();
+
+Here:
+
+    Integer = key type
+    String  = value type
+
+Another example:
+
+    Map<String, Double> products = new HashMap<>();
+
+5. IMPORTANT MAP METHODS
+
+The Map interface provides methods for:
+
+-   Adding entries
+-   Retrieving values
+-   Removing entries
+-   Checking keys and values
+-   Checking size
+-   Iterating
+-   Replacing values
+-   Conditional insertion
+-   Conditional replacement
+-   Computing values
+-   Merging values
+-   Working with default values
+
+6. put(K key, V value)
+
+Adds a key-value pair to the map.
+
+Syntax:
+
+    V put(K key, V value);
+
+Example:
+
+    Map<Integer, String> map = new HashMap<>();
+
+    map.put(101, "Java");
+    map.put(102, "Python");
+
+    System.out.println(map);
+
+Output:
+
+    {101=Java, 102=Python}
+
+IMPORTANT:
+
+If the key already exists, the old value is replaced.
+
+Example:
+
+    map.put(101, "Java");
+    map.put(101, "Spring");
+
+Now:
+
+    101 -> Spring
+
+The put() method returns:
+
+-   null if the key did not previously exist
+-   the previous value if the key already existed
+
+7. putAll(Map<? extends K, ? extends V> m)
+
+Copies all entries from another Map.
+
+Example:
+
+    Map<Integer, String> map1 = new HashMap<>();
+
+    map1.put(101, "Java");
+    map1.put(102, "Python");
+
+    Map<Integer, String> map2 = new HashMap<>();
+
+    map2.put(103, "Spring");
+    map2.put(104, "Docker");
+
+    map1.putAll(map2);  map1 = map1+map2
+
+Now map1 contains:
+
+    101 -> Java
+    102 -> Python
+    103 -> Spring
+    104 -> Docker
+
+If a key already exists, its value is replaced.
+
+8. get(Object key)
+
+Returns the value associated with the specified key.
+
+Example:
+
+    Map<Integer, String> map = new HashMap<>();
+
+    map.put(101, "Java");
+    map.put(102, "Python");
+    map.put(999,null);
+
+    String value = map.get(101);
+
+    System.out.println(value);
+
+Output:
+
+    Java
+
+If the key does not exist:
+
+    map.get(999)
+
+returns:
+
+    null
+
+Important: get() returning null does not always tell you whether the key
+is absent, because a Map may permit null values.
+
+Use containsKey() when that distinction matters.
+
+9. getOrDefault(Object key, V defaultValue)
+
+Returns the value associated with the key.
+
+If the key does not exist, returns the supplied default value.
+
+Example:
+
+    Map<Integer, String> map = new HashMap<>();
+
+    map.put(101, "Java");
+
+    System.out.println(map.getOrDefault(101, "Unknown"));
+    System.out.println(map.getOrDefault(999, "Unknown"));
+
+Output:
+
+    Java
+    Unknown
+
+10. remove(Object key)
+
+Removes the mapping associated with the specified key.
+
+Example:
+
+    Map<Integer, String> map = new HashMap<>();
+
+    map.put(101, "Java");
+    map.put(102, "Python");
+
+    String removed = map.remove(101);
+
+    System.out.println(removed);
+    System.out.println(map);
+
+Output:
+
+    Java
+    {102=Python}
+
+The method returns the removed value, or null if there was no mapping.
+
+11. remove(Object key, Object value)
+
+Removes the mapping only when the key is currently mapped to the
+specified value.
+
+Example:
+
+    Map<Integer, String> map = new HashMap<>();
+
+    map.put(101, "Java");
+
+    boolean result1 = map.remove(101, "Java");
+
+    System.out.println(result1);
+
+Output:
+
+    true
+
+Example:
+
+    map.put(101, "Java");
+
+    boolean result2 = map.remove(101, "Python");
+
+    System.out.println(result2);
+
+Output:
+
+    false
+
+This is useful when you want conditional deletion.
+
+12. containsKey(Object key)
+
+Checks whether a key exists.
+
+Returns boolean.
+
+Example:
+
+    Map<Integer, String> map = new HashMap<>();
+
+    map.put(101, "Java");
+
+    System.out.println(map.containsKey(101));
+    System.out.println(map.containsKey(999));
+
+Output:
+
+    true
+    false
+
+13. containsValue(Object value)
+
+Checks whether one or more entries contain the specified value.
+
+Example:
+
+    Map<Integer, String> map = new HashMap<>();
+
+    map.put(101, "Java");
+    map.put(102, "Python");
+
+    System.out.println(map.containsValue("Java"));
+    System.out.println(map.containsValue("101"));
+
+Output:
+
+    true
+    false
+
+Unlike keys, values do not need to be unique.
+
+14. size()
+
+Returns the number of key-value mappings.
+
+Example:
+
+    Map<Integer, String> map = new HashMap<>();
+
+    map.put(101, "Java");
+    map.put(102, "Python");
+    map.put(103, "Spring");
+
+    System.out.println(map.size());
+
+Output:
+
+    3
+
+15. isEmpty()
+
+Checks whether the Map contains no entries.
+
+Example:
+
+    Map<Integer, String> map = new HashMap<>();
+
+    System.out.println(map.isEmpty());
+
+    map.put(101, "Java");
+
+    System.out.println(map.isEmpty());
+
+Output:
+
+    true
+    false
+
+16. clear()
+
+Removes all mappings.
+
+Example:
+
+    Map<Integer, String> map = new HashMap<>();
+
+    map.put(101, "Java");
+    map.put(102, "Python");
+
+    map.clear();
+
+    System.out.println(map);
+    System.out.println(map.isEmpty());
+
+Output:
+
+    {}
+    true
+
+17. keySet()
+
+Returns a Set containing all keys.
+
+Return type:
+
+    Set<K>
+
+Example:
+
+    Map<Integer, String> map = new HashMap<>();
+
+    map.put(101, "Java");
+    map.put(102, "Python");
+    map.put(103, "Spring");
+
+    Set<Integer> keys = map.keySet();
+
+    System.out.println(keys);
+
+You can iterate over the keys:
+
+    for (Integer key : map.keySet()) {
+        System.out.println(key);
+    }
+
+The returned set is backed by the Map. Changes to the set can affect the
+map where supported.
+
+18. values()
+
+Returns a Collection containing all values.
+
+Return type:
+
+    Collection<V>
+
+Example:
+
+    Map<Integer, String> map = new HashMap<>();
+
+    map.put(101, "Java");
+    map.put(102, "Python");
+    map.put(103, "Spring");
+
+    Collection<String> values = map.values();
+
+    for (String value : values) {
+        System.out.println(value);
+    }
+
+Values do not have to be unique.
+
+19. entrySet()
+
+Returns a Set containing all key-value mappings.
+
+Return type:
+
+    Set<Map.Entry<K,V>>
+
+Example:
+
+    Map<Integer, String> map = new HashMap<>();
+
+    map.put(101, "Java");
+    map.put(102, "Python");
+
+((101,Java), (102,Python))  --> Map.Entry<Integer,String> 
+
+int a[] = {10,20,30,40};
+for(int x:a)
+	sop(x)
+
+
+
+    for (Map.Entry<Integer, String> entry : map.entrySet()) {
+
+        System.out.println(
+            entry.getKey() + " -> " + entry.getValue()
+        );
+    }
+
+Possible output:
+
+    101 -> Java
+    102 -> Python
+
+entrySet() is generally the most direct way to iterate through both keys
+and values.
+
+20. Map.Entry
+
+Map.Entry represents one key-value pair.
+
+Important methods include:
+
+    getKey()
+    getValue()
+    setValue(V value)
+    equals(Object o)
+    hashCode()
+    comparingByKey()
+    comparingByValue()
+
+Example:
+
+    for (Map.Entry<Integer, String> entry : map.entrySet()) {
+
+        System.out.println("Key: " + entry.getKey());
+        System.out.println("Value: " + entry.getValue());
+    }
+
+21. entry.getKey()
+
+Returns the key of the current entry.
+
+Example:
+
+    for (Map.Entry<Integer, String> entry : map.entrySet()) {
+        System.out.println(entry.getKey());
+    }
+
+22. entry.getValue()
+
+Returns the value of the current entry.
+
+Example:
+
+    for (Map.Entry<Integer, String> entry : map.entrySet()) {
+        System.out.println(entry.getValue());
+    }
+
+23. entry.setValue(V value)
+
+Replaces the value associated with the current entry.
+
+Example:
+
+    Map<Integer, String> map = new HashMap<>();
+
+    map.put(101, "Java");
+    map.put(102, "Python");
+
+    for (Map.Entry<Integer, String> entry : map.entrySet()) {
+
+        if (entry.getKey() == 101) {
+            entry.setValue("Spring");
+        }
+    }
+
+    System.out.println(map);
+
+Now:
+
+    101 -> Spring
+
+24. replace(K key, V value)
+
+Replaces the value only if the key already exists.
+
+Example:
+
+    Map<Integer, String> map = new HashMap<>();
+
+    map.put(101, "Java");
+
+    map.replace(101, "Spring");
+
+    System.out.println(map);
+
+Output:
+
+    {101=Spring}
+
+If the key does not exist, no new mapping is created.
+
+25. replace(K key, V oldValue, V newValue)
+
+Replaces the value only when the current value matches oldValue.
+
+Example:
+
+    Map<Integer, String> map = new HashMap<>();
+
+    map.put(101, "Java");
+
+    boolean result = map.replace(
+        101,
+        "Java",
+        "Spring"
+    );
+
+    System.out.println(result);
+    System.out.println(map);
+
+Output:
+
+    true
+    {101=Spring}
+
+26. replaceAll(BiFunction)
+
+Replaces every value by applying a function.
+
+Syntax:
+
+    map.replaceAll((key, value) -> newValue);
+
+Example:
+
+    Map<Integer, Integer> marks = new HashMap<>();
+
+    marks.put(101, 80);
+    marks.put(102, 70);
+    marks.put(103, 90);
+
+    marks.replaceAll(
+        (key, value) -> value + 5
+    );
+
+Now:
+
+    101 -> 85
+    102 -> 75
+    103 -> 95
+
+Example with String:
+
+    Map<String, String> names = new HashMap<>();
+
+    names.put("a", "java");
+    names.put("b", "python");
+
+    names.replaceAll(
+        (key, value) -> value.toUpperCase()
+    );
+
+27. putIfAbsent(K key, V value)
+
+Adds the mapping only if the key is not already associated with a value.
+
+Example:
+
+    Map<Integer, String> map = new HashMap<>();
+
+    map.put(101, "Java");
+
+    map.putIfAbsent(101, "Python");
+    map.putIfAbsent(102, "Spring");
+
+Result:
+
+    101 -> Java
+    102 -> Spring
+
+The existing value for 101 is not replaced.
+
+28. remove(key, value)
+
+This method was explained earlier, but it is important as a Java 8+
+conditional operation.
+
+Example:
+
+    map.remove(101, "Java");
+
+It removes the entry only if:
+
+    key == 101
+    AND
+    value == "Java"
+
+29. replaceAll()
+
+Java 8 introduced functional-style operations on Map.
+
+Example:
+
+    Map<String, Integer> salaries = new HashMap<>();
+
+    salaries.put("A", 50000);
+    salaries.put("B", 60000);
+
+    salaries.replaceAll(
+        (name, salary) -> salary + 5000
+    );
+
+30. compute(K key, BiFunction)
+
+Computes a new value for a key.
+
+Example:
+
+    Map<String, Integer> map = new HashMap<>();
+
+    map.put("Java", 10);
+
+    map.compute(
+        "Java",
+        (key, value) -> value + 5
+    );
+
+Result:
+
+    Java -> 15
+
+If the key does not exist, the value passed to the function is null.
+
+Example:
+
+    map.compute(
+        "Spring",
+        (key, value) -> 20
+    );
+
+Result:
+
+    Spring -> 20
+
+31. computeIfAbsent(K key, Function)
+
+Computes and inserts a value only if the key is absent or currently
+mapped to null.
+
+Example:
+
+    Map<String, Integer> wordLength = new HashMap<>();
+
+    wordLength.computeIfAbsent(
+        "Java",
+        key -> key.length()
+    );
+
+Result:
+
+    Java -> 4
+
+Another example:
+
+    Map<String, List<String>> groups = new HashMap<>();
+
+    groups.computeIfAbsent(
+        "Java",
+        key -> new ArrayList<>()
+    ).add("Spring");
+
+This is a very useful pattern for grouping data.
+
+32. computeIfPresent(K key, BiFunction)
+
+Computes a new value only if the key exists and has a non-null value.
+
+Example:
+
+    Map<String, Integer> map = new HashMap<>();
+
+    map.put("Java", 10);
+
+    map.computeIfPresent(
+        "Java",
+        (key, value) -> value + 10
+    );
+
+Result:
+
+    Java -> 20
+
+If the key does not exist, nothing happens.
+
+33. merge(K key, V value, BiFunction)
+
+Combines an existing value with a supplied value.
+
+Example:
+
+    Map<String, Integer> counts = new HashMap<>();
+
+    counts.put("Java", 1);
+
+    counts.merge(
+        "Java",
+        1,
+        (oldValue, newValue) -> oldValue + newValue
+    );
+
+Result:
+
+    Java -> 2
+
+If the key is absent:
+
+    counts.merge("Python", 1, Integer::sum);
+
+Result:
+
+    Python -> 1
+
+MERGE IS VERY USEFUL FOR: - Counting - Aggregation - Summing values -
+Building frequency maps
+
+34. forEach(BiConsumer)
+
+Performs an action for every mapping.
+
+Example:
+
+    Map<Integer, String> map = new HashMap<>();
+
+    map.put(101, "Java");
+    map.put(102, "Python");
+
+    map.forEach(
+        (key, value) ->
+            System.out.println(key + " -> " + value)
+    );
+
+35. equals(Object)
+
+Compares two maps for equality.
+
+Two maps are equal when they contain the same mappings.
+
+Example:
+
+    Map<Integer, String> map1 = new HashMap<>();
+    Map<Integer, String> map2 = new HashMap<>();
+
+    map1.put(101, "Java");
+    map2.put(101, "Java");
+
+    System.out.println(map1.equals(map2));
+
+Output:
+
+    true
+
+36. hashCode()
+
+Returns the hash code of the Map.
+
+Example:
+
+    Map<Integer, String> map = new HashMap<>();
+
+    map.put(101, "Java");
+
+    System.out.println(map.hashCode());
+
+The exact integer should not normally be relied upon as a business
+value.
+
+37. clone()
+
+Map itself does NOT define a clone() method.
+
+Some implementations such as HashMap provide a public clone() method.
+
+Example:
+
+    HashMap<Integer, String> original = new HashMap<>();
+
+    original.put(101, "Java");
+
+    HashMap<Integer, String> copy =
+        (HashMap<Integer, String>) original.clone();
+
+Do not assume that every Map implementation supports clone().
+
+38. DEFAULT METHODS: JAVA 8+
+
+Important Java 8+ Map methods include:
+
+    getOrDefault()
+    forEach()
+    replaceAll()
+    putIfAbsent()
+    remove(key, value)
+    replace(key, value)
+    replace(key, oldValue, newValue)
+    compute()
+    computeIfAbsent()
+    computeIfPresent()
+    merge()
+
+These methods work particularly well with lambda expressions.
+
+39. STATIC METHODS ADDED IN MODERN JAVA
+
+The Map interface also provides useful static factory methods.
+
+Map.of()
+
+Example:
+
+    Map<Integer, String> map =
+        Map.of(
+            101, "Java",
+            102, "Python",
+            103, "Spring"
+        );
+
+Important:
+
+Maps created using Map.of() are immutable.
+
+You cannot do:
+
+    map.put(104, "Docker");
+
+This throws UnsupportedOperationException.
+
+40. Map.ofEntries()
+
+Useful when creating many entries.
+
+Example:
+
+    Map<Integer, String> map =
+        Map.ofEntries(
+            Map.entry(101, "Java"),
+            Map.entry(102, "Python"),
+            Map.entry(103, "Spring")
+        );
+
+The resulting Map is immutable.
+
+41. Map.copyOf()
+
+Creates an unmodifiable Map containing the entries of another Map.
+
+Example:
+
+    Map<Integer, String> source = new HashMap<>();
+
+    source.put(101, "Java");
+    source.put(102, "Python");
+
+    Map<Integer, String> copy =
+        Map.copyOf(source);
+
+The returned Map cannot be modified through its Map interface.
+
+42. NULL VALUES
+
+Null support depends on the Map implementation.
+
+HashMap permits:
+
+    one null key
+    multiple null values
+
+Example:
+
+    Map<Integer, String> map = new HashMap<>();
+
+    map.put(null, "Unknown");
+    map.put(101, null);
+
+LinkedHashMap also permits null keys and values.
+
+TreeMap generally does not permit a null key when natural ordering is
+used.
+
+ConcurrentHashMap does not permit null keys or null values.
+
+Always check the implementation’s contract before relying on null
+support.
+
+43. HASHMAP
+
+HashMap is the most commonly used Map implementation.
+
+Example:
+
+    Map<Integer, String> map = new HashMap<>();
+
+Properties:
+
+-   Allows one null key.
+-   Allows multiple null values.
+-   Does not guarantee insertion order.
+-   Average-time lookup is generally efficient.
+-   Not synchronized.
+-   Allows fast key-based access in typical use cases.
+
+44. LINKEDHASHMAP
+
+LinkedHashMap maintains a predictable iteration order, normally
+insertion order.
+
+Example:
+
+    Map<Integer, String> map =
+        new LinkedHashMap<>();
+
+    map.put(101, "Java");
+    map.put(102, "Python");
+    map.put(103, "Spring");
+
+Iteration normally produces:
+
+    101 -> Java
+    102 -> Python
+    103 -> Spring
+
+LinkedHashMap can also be configured for access-order behavior, which is
+useful in some cache implementations.
+
+45. TREEMAP
+
+TreeMap stores entries according to key ordering.
+
+Example:
+
+    Map<Integer, String> map =
+        new TreeMap<>();
+
+    map.put(103, "Spring");
+    map.put(101, "Java");
+    map.put(102, "Python");
+
+Iteration produces keys in sorted order:
+
+    101 -> Java
+    102 -> Python
+    103 -> Spring
+
+TreeMap is useful when sorted key traversal is required.
+
+TreeMap implements SortedMap and NavigableMap.
+
+46. HASHTABLE
+
+Hashtable is an older Map implementation.
+
+Important properties:
+
+-   Synchronized.
+-   Does not permit null keys.
+-   Does not permit null values.
+-   Considered legacy API.
+-   For modern concurrent applications, ConcurrentHashMap is often more
+    appropriate.
+
+47. CONCURRENTHASHMAP
+
+ConcurrentHashMap is designed for concurrent access.
+
+Example:
+
+    Map<Integer, String> map =
+        new ConcurrentHashMap<>();
+
+It does not permit null keys or null values.
+
+It provides thread-safe operations while supporting concurrent access.
+
+48. ITERATING THROUGH A MAP
+
+Approach 1: keySet()
+
+    for (Integer key : map.keySet()) {
+        System.out.println(
+            key + " -> " + map.get(key)
+        );
+    }
+
+Approach 2: entrySet()
+
+    for (Map.Entry<Integer, String> entry :
+            map.entrySet()) {
+
+        System.out.println(
+            entry.getKey() + " -> " +
+            entry.getValue()
+        );
+    }
+
+Approach 3: forEach()
+
+    map.forEach(
+        (key, value) ->
+            System.out.println(
+                key + " -> " + value
+            )
+    );
+
+For accessing both key and value, entrySet() is generally the clearest
+traditional approach.
+
+49. SORTING A MAP BY KEY
+
+TreeMap:
+
+    Map<Integer, String> map =
+        new TreeMap<>();
+
+    map.put(103, "Spring");
+    map.put(101, "Java");
+    map.put(102, "Python");
+
+The keys are automatically sorted.
+
+Another approach:
+
+    Map<Integer, String> map =
+        new HashMap<>();
+
+    map.put(103, "Spring");
+    map.put(101, "Java");
+    map.put(102, "Python");
+
+    map.entrySet()
+       .stream()
+       .sorted(Map.Entry.comparingByKey())
+       .forEach(System.out::println);
+
+50. SORTING A MAP BY VALUE
+
+Example:
+
+    Map<String, Integer> marks =
+        new HashMap<>();
+
+    marks.put("Praveen", 90);
+    marks.put("Ravi", 75);
+    marks.put("Kiran", 85);
+
+    marks.entrySet()
+         .stream()
+         .sorted(Map.Entry.comparingByValue())
+         .forEach(System.out::println);
+
+51. MAP WITH OBJECT VALUES
+
+A Map can store objects as values.
+
+Example:
+
+    class Employee {
+
+        private int id;
+        private String name;
+
+        Employee(int id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public String getName() {
+            return name;
+        }
+    }
+
+    Map<Integer, Employee> employees =
+        new HashMap<>();
+
+    employees.put(
+        101,
+        new Employee(101, "Praveen")
+    );
+
+    Employee employee = employees.get(101);
+
+    System.out.println(employee.getName());
+
+52. MAP AS A FREQUENCY COUNTER
+
+Suppose we want to count the frequency of words.
+
+Example:
+
+    String[] words = {
+        "java",
+        "python",
+        "java",
+        "spring",
+        "java",
+        "python"
+    };
+
+    Map<String, Integer> frequency =
+        new HashMap<>();
+
+    for (String word : words) {
+
+        frequency.merge(
+            word,
+            1,
+            Integer::sum
+        );
+    }
+
+Result:
+
+    java -> 3
+    python -> 2
+    spring -> 1
+
+This is one of the most useful real-world applications of Map.
+
+53. GROUPING DATA USING MAP
+
+Example:
+
+    Map<String, List<String>> employees =
+        new HashMap<>();
+
+    employees
+        .computeIfAbsent(
+            "IT",
+            key -> new ArrayList<>()
+        )
+        .add("Praveen");
+
+    employees
+        .computeIfAbsent(
+            "IT",
+            key -> new ArrayList<>()
+        )
+        .add("Ravi");
+
+    employees
+        .computeIfAbsent(
+            "HR",
+            key -> new ArrayList<>()
+        )
+        .add("Kiran");
+
+Result conceptually:
+
+    IT -> [Praveen, Ravi]
+    HR -> [Kiran]
+
+54. MAP VS COLLECTION
+
+Collection:
+
+    Collection<E>
+
+stores individual elements.
+
+Example:
+
+    List<String> names
+
+Map:
+
+    Map<K,V>
+
+stores key-value associations.
+
+Example:
+
+    Map<Integer, String> students
+
+A Map does not extend Collection.
+
+55. MAP VS LIST
+
+List:
+
+    List<String> names
+
+Characteristics:
+
+-   Ordered sequence.
+-   Elements are accessed using indexes.
+-   Duplicate elements are allowed.
+
+Map:
+
+    Map<Integer, String> students
+
+Characteristics:
+
+-   Data is organized using keys.
+-   Keys are unique.
+-   Values can be duplicated.
+
+56. MAP VS SET
+
+Set:
+
+    Set<Integer> ids
+
+Stores unique individual elements.
+
+Map:
+
+    Map<Integer, String> students
+
+Stores unique keys associated with values.
+
+HashSet internally uses hashing concepts related to HashMap.
+
+57. HASHMAP VS LINKEDHASHMAP VS TREEMAP
+
+HashMap: - No guaranteed iteration order. - Generally fast lookup. -
+Allows null key. - Good general-purpose choice.
+
+LinkedHashMap: - Maintains insertion order by default. - Slightly more
+overhead than HashMap. - Useful when predictable iteration order is
+needed.
+
+TreeMap: - Maintains sorted key order. - Operations are generally
+logarithmic. - Useful when sorted/navigable keys are required.
+
+58. IMPORTANT METHODS SUMMARY
+
+Method Purpose
+
+put() Add/update mapping putAll() Copy mappings putIfAbsent() Add only
+if absent get() Retrieve value getOrDefault() Retrieve or use default
+remove(key) Remove by key remove(key,value) Conditional removal
+containsKey() Check key containsValue() Check value size() Number of
+entries isEmpty() Check whether empty clear() Remove all entries
+keySet() Get keys values() Get values entrySet() Get key-value entries
+replace() Replace existing value replaceAll() Replace all values using
+function compute() Recalculate a value computeIfAbsent() Calculate value
+when absent computeIfPresent() Calculate value when present merge()
+Combine old and new values forEach() Iterate using action equals()
+Compare maps hashCode() Return map hash code
+
+59. IMPORTANT MAP.ENTRY METHODS
+
+getKey() Returns the key.
+
+getValue() Returns the value.
+
+setValue() Replaces the current value.
+
+equals() Compares entries.
+
+hashCode() Returns entry hash code.
+
+comparingByKey() Creates a comparator based on keys.
+
+comparingByValue() Creates a comparator based on values.
+
+60. COMPLETE DEMONSTRATION PROGRAM
+
+    import java.util.*;
+
+    public class MapCompleteDemo {
+
+        public static void main(String[] args) {
+
+            Map<Integer, String> map =
+                new HashMap<>();
+
+            // Adding data
+            map.put(101, "Java");
+            map.put(102, "Python");
+            map.put(103, "Spring");
+
+            // Reading data
+            System.out.println(
+                "Value = " + map.get(101)
+            );
+
+            // Check key
+            System.out.println(
+                "Contains 101 = " +
+                map.containsKey(101)
+            );
+
+            // Check value
+            System.out.println(
+                "Contains Java = " +
+                map.containsValue("Java")
+            );
+
+            // Size
+            System.out.println(
+                "Size = " + map.size()
+            );
+
+            // Default value
+            System.out.println(
+                map.getOrDefault(
+                    999,
+                    "Not Found"
+                )
+            );
+
+            // Conditional insertion
+            map.putIfAbsent(104, "Docker");
+
+            // Replace
+            map.replace(102, "Django");
+
+            // Iterate using entrySet
+            for (Map.Entry<Integer, String> entry :
+                    map.entrySet()) {
+
+                System.out.println(
+                    entry.getKey() +
+                    " -> " +
+                    entry.getValue()
+                );
+            }
+
+            // Java 8 forEach
+            map.forEach(
+                (key, value) ->
+                    System.out.println(
+                        key + " = " + value
+                    )
+            );
+
+            // Remove
+            map.remove(103);
+
+            System.out.println(map);
+        }
+    }
+
+61. INTERVIEW QUESTIONS
+
+1.  What is the Map interface?
+
+2.  Does Map extend Collection?
+
+3.  What is the difference between key and value?
+
+4.  Can a Map contain duplicate keys?
+
+5.  Can a Map contain duplicate values?
+
+6.  What happens when put() is called with an existing key?
+
+7.  What is the difference between get() and getOrDefault()?
+
+8.  What is the difference between remove(key) and remove(key,value)?
+
+9.  What is the difference between put() and putIfAbsent()?
+
+10. What is the difference between replace() and put()?
+
+11. What is the difference between keySet(), values(), and entrySet()?
+
+12. Why is entrySet() commonly used for Map iteration?
+
+13. What is Map.Entry?
+
+14. What is the difference between HashMap and LinkedHashMap?
+
+15. What is the difference between HashMap and TreeMap?
+
+16. Does HashMap allow null keys?
+
+17. Does TreeMap allow null keys?
+
+18. Does ConcurrentHashMap allow null keys?
+
+19. What is computeIfAbsent()?
+
+20. What is computeIfPresent()?
+
+21. What is the purpose of merge()?
+
+22. How can Map be used as a frequency counter?
+
+23. How can Map be used for grouping?
+
+24. What is the difference between Map.of() and HashMap?
+
+25. Is Map.of() mutable?
+
+26. What is the purpose of Map.copyOf()?
+
+27. How do you sort a Map by key?
+
+28. How do you sort a Map by value?
+
+29. How do you iterate through a Map using lambda expressions?
+
+30. Which Map implementation should be used when sorted keys are
+    required?
+
+31. PRACTICE EXERCISES
+
+Exercise 1: Create a Map<Integer, String> containing 5 student IDs and
+names. Display all entries.
+
+Exercise 2: Create a Map<String, Integer> containing employee names and
+salaries. Increase every salary by 10% using replaceAll().
+
+Exercise 3: Create a Map<String, Integer> and count the frequency of
+words in a sentence.
+
+Exercise 4: Create a Map<Integer, String> and demonstrate: put() get()
+remove() containsKey() containsValue() size()
+
+Exercise 5: Create a Map<String, Integer> and demonstrate: putIfAbsent()
+replace() getOrDefault()
+
+Exercise 6: Create a Map<String, Integer> representing product
+quantities. Use merge() to increase the quantity whenever the same
+product is added.
+
+Exercise 7: Create a Map<String, List> representing departments and
+employees. Use computeIfAbsent() to add employees.
+
+Exercise 8: Create a TreeMap of student marks and display students
+according to sorted IDs.
+
+Exercise 9: Create a LinkedHashMap and demonstrate that insertion order
+is maintained.
+
+Exercise 10: Create a Map of employees and Employee objects as values.
+Search and display an employee using the employee ID.
+
+63. KEY TAKEAWAYS
+
+-   Map stores key-value pairs.
+-   Keys are unique.
+-   Values may be duplicated.
+-   Map is separate from the Collection hierarchy.
+-   HashMap is a common general-purpose implementation.
+-   LinkedHashMap maintains predictable iteration order.
+-   TreeMap maintains sorted key order.
+-   ConcurrentHashMap supports concurrent access and does not permit
+    null keys/values.
+-   keySet() provides keys.
+-   values() provides values.
+-   entrySet() provides key-value entries.
+-   put() adds or replaces a mapping.
+-   putIfAbsent() adds only when appropriate.
+-   get() retrieves a value.
+-   remove() deletes mappings.
+-   replace() updates existing mappings.
+-   compute(), computeIfAbsent(), and computeIfPresent() support
+    calculated updates.
+-   merge() is especially useful for counting and aggregation.
+-   forEach() supports lambda-based iteration.
+-   Map.of(), Map.ofEntries(), and Map.copyOf() provide convenient
+    unmodifiable maps.
