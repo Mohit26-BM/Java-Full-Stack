@@ -24,7 +24,7 @@ public class AccountServiceImpl implements AccountService {
     private final CustomerDao customerDao;
     private final TransactionService transactionService;
 
-    private static int nextAccountNumber = 1001;
+   
 
     public AccountServiceImpl(AccountDao accountDao,
                               CustomerDao customerDao,
@@ -34,10 +34,6 @@ public class AccountServiceImpl implements AccountService {
         this.customerDao = customerDao;
         this.transactionService = transactionService;
     }
-
-    // =========================================================
-    // CREATE ACCOUNT
-    // =========================================================
 
     @Override
     public int createAccount(
@@ -124,22 +120,9 @@ public class AccountServiceImpl implements AccountService {
         return accountNumber;
     }
 
-    // =========================================================
-    // GENERATE ACCOUNT NUMBER
-    // =========================================================
-
     private int generateAccountNumber() {
-
-        while (accountDao.getAccount(nextAccountNumber) != null) {
-            nextAccountNumber++;
-        }
-
-        return nextAccountNumber++;
+        return accountDao.getNextAccountNumber();
     }
-
- // =========================================================
- // CLOSE ACCOUNT
- // =========================================================
 
  @Override
  public void closeAccount(int accountNumber)
@@ -184,10 +167,7 @@ public class AccountServiceImpl implements AccountService {
          );
      }
  }
-    // =========================================================
-    // DEPOSIT
-    // =========================================================
-
+ 
     @Override
     public void deposit(
             int accountNumber,
@@ -245,10 +225,6 @@ public class AccountServiceImpl implements AccountService {
 
         transactionService.addTransaction(transaction);
     }
-
-    // =========================================================
-    // WITHDRAW
-    // =========================================================
 
     @Override
     public void withdraw(
@@ -317,10 +293,6 @@ public class AccountServiceImpl implements AccountService {
 
         transactionService.addTransaction(transaction);
     }
-
-    // =========================================================
-    // FUND TRANSFER
-    // =========================================================
 
     @Override
     public void fundsTransfer(
@@ -431,10 +403,6 @@ public class AccountServiceImpl implements AccountService {
         transactionService.addTransaction(senderTransaction);
         transactionService.addTransaction(receiverTransaction);
     }
-
-    // =========================================================
-    // GET ALL ACCOUNTS
-    // =========================================================
 
     @Override
     public List<Account> getAllAccounts() {

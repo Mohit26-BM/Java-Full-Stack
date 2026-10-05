@@ -38,10 +38,6 @@ public class MainBank {
 
     public static void main(String[] args) {
 
-        // =====================================================
-        // DAO OBJECTS
-        // =====================================================
-
         CustomerDao customerDao =
                 new CustomerDaoImpl();
 
@@ -50,11 +46,6 @@ public class MainBank {
 
         TransactionDao transactionDao =
                 new TransactionDaoImpl();
-
-
-        // =====================================================
-        // SERVICE OBJECTS
-        // =====================================================
 
         CustomerService customerService =
                 new CustomerServiceImpl(
@@ -74,11 +65,6 @@ public class MainBank {
                         transactionService
                 );
 
-
-        // =====================================================
-        // MAIN APPLICATION LOOP
-        // =====================================================
-
         while (true) {
 
             showMenu();
@@ -87,10 +73,6 @@ public class MainBank {
                     readPositiveInt("Enter your choice: ");
 
             switch (choice) {
-
-                // =================================================
-                // CUSTOMER OPERATIONS
-                // =================================================
 
                 case 1:
                     addCustomer(customerService);
@@ -107,11 +89,6 @@ public class MainBank {
                 case 4:
                     deleteCustomer(customerService);
                     break;
-
-
-                // =================================================
-                // ACCOUNT OPERATIONS
-                // =================================================
 
                 case 5:
                     createAccount(accountService);
@@ -137,11 +114,6 @@ public class MainBank {
                     closeAccount(accountService);
                     break;
 
-
-                // =================================================
-                // TRANSACTION OPERATIONS
-                // =================================================
-
                 case 11:
                     displayAllTransactions(transactionService);
                     break;
@@ -164,11 +136,6 @@ public class MainBank {
                     );
                     break;
 
-
-                // =================================================
-                // EXIT
-                // =================================================
-
                 case 15:
                     System.out.println(
                             "\nThank you for using the Banking Management System."
@@ -184,11 +151,6 @@ public class MainBank {
             }
         }
     }
-
-
-    // =========================================================
-    // MENU
-    // =========================================================
 
     private static void showMenu() {
 
@@ -238,12 +200,7 @@ public class MainBank {
                 "========================================"
         );
     }
-
-
-    // =========================================================
-    // CREATE CUSTOMER
-    // =========================================================
-
+    
     private static void addCustomer(
             CustomerService customerService) {
 
@@ -302,11 +259,6 @@ public class MainBank {
         }
     }
 
-
-    // =========================================================
-    // DISPLAY ALL CUSTOMERS
-    // =========================================================
-
     private static void displayAllCustomers(
             CustomerService customerService) {
 
@@ -331,11 +283,6 @@ public class MainBank {
             System.out.println(customer);
         }
     }
-
-
-    // =========================================================
-    // SEARCH CUSTOMER
-    // =========================================================
 
     private static void searchCustomer(
             CustomerService customerService) {
@@ -369,11 +316,6 @@ public class MainBank {
             );
         }
     }
-
-
-    // =========================================================
-    // DELETE CUSTOMER
-    // =========================================================
 
     private static void deleteCustomer(
             CustomerService customerService) {
@@ -416,11 +358,6 @@ public class MainBank {
             );
         }
     }
-
-
-    // =========================================================
-    // CREATE ACCOUNT
-    // =========================================================
 
     private static void createAccount(
             AccountService accountService) {
@@ -505,11 +442,6 @@ public class MainBank {
         }
     }
 
-
-    // =========================================================
-    // READ ACCOUNT TYPE
-    // =========================================================
-
     private static AccountType readAccountType() {
 
         while (true) {
@@ -549,11 +481,6 @@ public class MainBank {
         }
     }
 
-
-    // =========================================================
-    // DISPLAY ALL ACCOUNTS
-    // =========================================================
-
     private static void displayAllAccounts(
             AccountService accountService) {
 
@@ -578,11 +505,6 @@ public class MainBank {
             System.out.println(account);
         }
     }
-
-
-    // =========================================================
-    // DEPOSIT MONEY
-    // =========================================================
 
     private static void depositMoney(
             AccountService accountService) {
@@ -637,11 +559,6 @@ public class MainBank {
             );
         }
     }
-
-
-    // =========================================================
-    // WITHDRAW MONEY
-    // =========================================================
 
     private static void withdrawMoney(
             AccountService accountService) {
@@ -702,11 +619,6 @@ public class MainBank {
             );
         }
     }
-
-
-    // =========================================================
-    // TRANSFER FUNDS
-    // =========================================================
 
     private static void transferFunds(
             AccountService accountService) {
@@ -774,11 +686,6 @@ public class MainBank {
         }
     }
 
-
-    // =========================================================
-    // CLOSE ACCOUNT
-    // =========================================================
-
     private static void closeAccount(
             AccountService accountService) {
 
@@ -820,11 +727,6 @@ public class MainBank {
         }
     }
 
-
-    // =========================================================
-    // DISPLAY ALL TRANSACTIONS
-    // =========================================================
-
     private static void displayAllTransactions(
             TransactionService transactionService) {
 
@@ -849,11 +751,6 @@ public class MainBank {
             System.out.println(transaction);
         }
     }
-
-
-    // =========================================================
-    // TRANSACTIONS BY ACCOUNT
-    // =========================================================
 
     private static void displayTransactionsByAccount(
             TransactionService transactionService) {
@@ -899,11 +796,6 @@ public class MainBank {
             );
         }
     }
-
-
-    // =========================================================
-    // TRANSACTIONS BY TYPE
-    // =========================================================
 
     private static void displayTransactionsByType(
             TransactionService transactionService) {
@@ -977,11 +869,6 @@ public class MainBank {
         }
     }
 
-
-    // =========================================================
-    // TRANSACTIONS BY DATE RANGE
-    // =========================================================
-
     private static void displayTransactionsByDateRange(
             TransactionService transactionService) {
 
@@ -1036,11 +923,6 @@ public class MainBank {
         }
     }
 
-
-    // =========================================================
-    // READ POSITIVE INTEGER
-    // =========================================================
-
     private static int readPositiveInt(
             String message) {
 
@@ -1077,11 +959,6 @@ public class MainBank {
             }
         }
     }
-
-
-    // =========================================================
-    // READ NON-NEGATIVE INTEGER
-    // =========================================================
 
     private static int readNonNegativeInt(
             String message) {
@@ -1120,11 +997,6 @@ public class MainBank {
         }
     }
 
-
-    // =========================================================
-    // READ NAME
-    // =========================================================
-
     private static String readName(
             String message) {
 
@@ -1159,11 +1031,6 @@ public class MainBank {
         }
     }
 
-
-    // =========================================================
-    // READ EMAIL
-    // =========================================================
-
     private static String readEmail(
             String message) {
 
@@ -1197,11 +1064,6 @@ public class MainBank {
             return input;
         }
     }
-
-
-    // =========================================================
-    // READ PHONE
-    // =========================================================
 
     private static String readPhone(
             String message) {

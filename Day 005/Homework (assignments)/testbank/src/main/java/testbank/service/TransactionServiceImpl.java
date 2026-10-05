@@ -9,8 +9,6 @@ public class TransactionServiceImpl implements TransactionService {
 
     private final TransactionDao transactionDao;
 
-    private static int nextTransactionId = 1;
-
     public TransactionServiceImpl(TransactionDao transactionDao) {
         this.transactionDao = transactionDao;
     }
@@ -23,8 +21,6 @@ public class TransactionServiceImpl implements TransactionService {
                     "Transaction cannot be null."
             );
         }
-
-        transaction.setId(nextTransactionId++);
 
         boolean added =
                 transactionDao.addTransaction(transaction);

@@ -1,17 +1,16 @@
 package testbank.dao;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import testbank.entity.Customer;
+import testbank.util.DBConnection;
 
 public class CustomerDaoImpl implements CustomerDao {
-
-    private final List<Customer> customers;
-
-    public CustomerDaoImpl() {
-        customers = new ArrayList<>();
-    }
 
     @Override
     public boolean addCustomer(Customer customer) {
@@ -20,25 +19,55 @@ public class CustomerDaoImpl implements CustomerDao {
             return false;
         }
 
-        // Check whether customer ID already exists
-        Customer existingCustomer = getCustomerById(customer.getCustomerId());
+        String sql = "INSERT INTO customer "
+                   + "(Customer_ID, Name, Email, Phone) "
+                   + "VALUES (?, ?, ?, ?)";
 
-        if (existingCustomer != null) {
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement statement =
+                     connection.prepareStatement(sql)) {
+
+            statement.setInt(1, customer.getCustomerId());
+            statement.setString(2, customer.getName());
+            statement.setString(3, customer.getEmail());
+            statement.setString(4, customer.getPhone());
+
+            return statement.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
             return false;
         }
-
-        customers.add(customer);
-        return true;
     }
 
     @Override
     public Customer getCustomerById(int customerId) {
 
-        for (Customer customer : customers) {
+        String sql = "SELECT Customer_ID, Name, Email, Phone "
+                   + "FROM customer "
+                   + "WHERE Customer_ID = ?";
 
-            if (customer.getCustomerId() == customerId) {
-                return customer;
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement statement =
+                     connection.prepareStatement(sql)) {
+
+            statement.setInt(1, customerId);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+
+                if (resultSet.next()) {
+
+                    return new Customer(
+                            resultSet.getInt("Customer_ID"),
+                            resultSet.getString("Name"),
+                            resultSet.getString("Email"),
+                            resultSet.getString("Phone")
+                    );
+                }
             }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
 
         return null;
@@ -47,7 +76,33 @@ public class CustomerDaoImpl implements CustomerDao {
     @Override
     public List<Customer> getAllCustomers() {
 
-        return new ArrayList<>(customers);
+        List<Customer> customers = new ArrayList<>();
+
+        String sql = "SELECT Customer_ID, Name, Email, Phone "
+                   + "FROM customer";
+
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement statement =
+                     connection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
+
+            while (resultSet.next()) {
+
+                Customer customer = new Customer(
+                        resultSet.getInt("Customer_ID"),
+                        resultSet.getString("Name"),
+                        resultSet.getString("Email"),
+                        resultSet.getString("Phone")
+                );
+
+                customers.add(customer);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return customers;
     }
 
     @Override
@@ -57,30 +112,44 @@ public class CustomerDaoImpl implements CustomerDao {
             return false;
         }
 
-        Customer existingCustomer =
-                getCustomerById(customer.getCustomerId());
+        String sql = "UPDATE customer "
+                   + "SET Name = ?, Email = ?, Phone = ? "
+                   + "WHERE Customer_ID = ?";
 
-        if (existingCustomer == null) {
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement statement =
+                     connection.prepareStatement(sql)) {
+
+            statement.setString(1, customer.getName());
+            statement.setString(2, customer.getEmail());
+            statement.setString(3, customer.getPhone());
+            statement.setInt(4, customer.getCustomerId());
+
+            return statement.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
             return false;
         }
-
-        existingCustomer.setName(customer.getName());
-        existingCustomer.setEmail(customer.getEmail());
-        existingCustomer.setPhone(customer.getPhone());
-
-        return true;
     }
 
     @Override
     public boolean deleteCustomer(int customerId) {
 
-        Customer customer = getCustomerById(customerId);
+        String sql = "DELETE FROM customer "
+                   + "WHERE Customer_ID = ?";
 
-        if (customer == null) {
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement statement =
+                     connection.prepareStatement(sql)) {
+
+            statement.setInt(1, customerId);
+
+            return statement.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
             return false;
         }
-
-        customers.remove(customer);
-        return true;
     }
 }

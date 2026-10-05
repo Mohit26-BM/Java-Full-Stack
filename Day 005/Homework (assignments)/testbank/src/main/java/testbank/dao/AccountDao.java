@@ -1,7 +1,6 @@
 package testbank.dao;
 
 import java.util.List;
-
 import testbank.entity.Account;
 
 public interface AccountDao {
@@ -15,4 +14,6 @@ public interface AccountDao {
     boolean deleteAccount(int accountNumber);
 
     List<Account> getAllAccounts();
+
+    int getNextAccountNumber();
 }
