@@ -1,0 +1,1047 @@
+JAVA MODERN LANGUAGE FEATURES – DETAILED TRAINER REFERENCE
+===============================================================
+
+Topics:
+1. Records
+2. Sealed Classes
+3. Pattern Matching
+4. null in switch
+5. Private Methods in Interfaces
+6. var keyword
+7. Modern String methods
+8. Local variable syntax in lambda expressions
+
+Java 21+ is recommended for demonstrating all examples, especially pattern
+matching for switch and explicit null handling in switch.
+
+
+======================================================================
+1. RECORDS
+======================================================================
+
+A record is a special kind of class designed primarily to model data.
+The compiler supplies a canonical constructor, component accessors,
+equals(), hashCode(), and toString().
+
+Traditional class:
+
+    public final class Customer {
+        private final int id;
+        private final String name;
+
+        public Customer(int id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public String getName() {
+            return name;
+        }
+    }
+
+Equivalent record:
+
+    public record Customer(int id, String name) {
+    }
+
+Record accessors are id() and name(), not getId() and getName().
+
+Example:
+
+    public record Employee(
+        int id,
+        String name,
+        double salary
+    ) {
+    }
+
+    Employee e = new Employee(101, "Praveen", 85000);
+
+    System.out.println(e.id());
+    System.out.println(e.name());
+    System.out.println(e.salary());
+    System.out.println(e);
+
+A record automatically provides:
+- canonical constructor
+- component accessors
+- equals()
+- hashCode()
+- toString()
+
+Records are implicitly final and cannot extend another class, but they can
+implement interfaces.
+
+COMPACT CONSTRUCTOR
+
+A compact constructor is useful for validation:
+
+    public record Employee(
+        int id,
+        String name,
+        double salary
+    ) {
+        public Employee {
+            if (id <= 0) {
+                throw new IllegalArgumentException("Invalid ID");
+            }
+            if (name == null || name.isBlank()) {
+                throw new IllegalArgumentException("Invalid name");
+            }
+            if (salary < 0) {
+                throw new IllegalArgumentException("Salary cannot be negative");
+            }
+        }
+    }
+
+The compiler performs the component assignments automatically.
+
+RECORD METHODS
+
+    public record Employee(int id, String name, double salary) {
+
+        public double annualBonus() {
+            return salary * 0.10;
+        }
+
+        public boolean highEarner() {
+            return salary >= 100000;
+        }
+    }
+
+BANKING EXAMPLE
+
+    public record Transaction(
+        String transactionId,
+        String accountNumber,
+        double amount,
+        String type
+    ) {
+    }
+
+    Transaction t = new Transaction(
+        "TX1001", "ACC101", 5000, "DEPOSIT"
+    );
+
+    System.out.println(t.transactionId());
+    System.out.println(t.amount());
+
+Records are excellent for DTOs, transaction objects, API responses, and
+small immutable domain values.
+
+
+======================================================================
+2. SEALED CLASSES
+======================================================================
+
+A sealed class or interface restricts which classes may directly extend or
+implement it.
+
+Traditional:
+
+    class Account { }
+    class SavingsAccount extends Account { }
+    class CurrentAccount extends Account { }
+
+Sealed:
+
+    public sealed class Account
+            permits SavingsAccount, CurrentAccount {
+    }
+
+    public final class SavingsAccount extends Account {
+    }
+
+    public final class CurrentAccount extends Account {
+    }
+
+This is illegal:
+
+    public class LoanAccount extends Account {
+    }
+
+because LoanAccount is not permitted.
+
+WHY USE SEALED CLASSES?
+
+- controlled inheritance
+- clearer domain modeling
+- safer APIs
+- compiler knowledge of the complete hierarchy
+- excellent combination with pattern matching
+
+PERMITTED SUBCLASS MODIFIERS
+
+A permitted subclass must be final, sealed, or non-sealed.
+
+    public sealed class Payment
+            permits CardPayment, CashPayment, DigitalPayment {
+    }
+
+    public final class CardPayment extends Payment {
+    }
+
+    public sealed class CashPayment extends Payment
+            permits PhysicalCashPayment {
+    }
+
+    public final class PhysicalCashPayment extends CashPayment {
+    }
+
+    public non-sealed class DigitalPayment extends Payment {
+    }
+
+final stops further inheritance.
+sealed continues controlled inheritance.
+non-sealed opens the hierarchy again.
+
+BANKING EXAMPLE
+
+    public sealed interface Account
+            permits SavingsAccount, CurrentAccount {
+    }
+
+    public final class SavingsAccount implements Account {
+    }
+
+    public final class CurrentAccount implements Account {
+    }
+
+This clearly communicates that Account has a controlled set of subtypes.
+
+
+======================================================================
+3. PATTERN MATCHING
+======================================================================
+
+Pattern matching combines type checking with variable binding.
+
+BEFORE PATTERN MATCHING
+
+    Object obj = "Hello";
+
+    if (obj instanceof String) {
+        String value = (String) obj;
+        System.out.println(value.length());
+    }
+
+MODERN instanceof PATTERN
+
+    Object obj = "Hello";
+
+    if (obj instanceof String value) {
+        System.out.println(value.length());
+    }
+
+The variable value is a pattern variable.
+
+WITH &&
+
+    if (obj instanceof String value && value.length() > 5) {
+        System.out.println(value);
+    }
+
+PATTERN MATCHING FOR switch
+
+    static String describe(Object obj) {
+
+        return switch (obj) {
+
+            case String s ->
+                "String with length " + s.length();
+
+            case Integer i ->
+                "Integer with value " + i;
+
+            case Double d ->
+                "Double with value " + d;
+
+            default ->
+                "Unknown type";
+        };
+    }
+
+This avoids repeated instanceof checks and explicit casts.
+
+PATTERN MATCHING + SEALED TYPES
+
+    public sealed interface Payment
+            permits CardPayment, CashPayment, UpiPayment {
+    }
+
+    public record CardPayment(double amount)
+            implements Payment {
+    }
+
+    public record CashPayment(double amount)
+            implements Payment {
+    }
+
+    public record UpiPayment(double amount)
+            implements Payment {
+    }
+
+    static String process(Payment payment) {
+
+        return switch (payment) {
+
+            case CardPayment c ->
+                "Processing card: " + c.amount();
+
+            case CashPayment c ->
+                "Processing cash: " + c.amount();
+
+            case UpiPayment u ->
+                "Processing UPI: " + u.amount();
+        };
+    }
+
+Because Payment is sealed and every permitted subtype is handled, the
+compiler can verify that the switch is exhaustive.
+
+
+======================================================================
+4. null IN SWITCH
+======================================================================
+
+Historically, a switch selector containing null could cause
+NullPointerException. Modern Java allows an explicit null case.
+
+    String value = null;
+
+    switch (value) {
+
+        case null:
+            System.out.println("Value is null");
+            break;
+
+        case "A":
+            System.out.println("Value is A");
+            break;
+
+        default:
+            System.out.println("Other value");
+    }
+
+SWITCH EXPRESSION
+
+    String result = switch (value) {
+
+        case null -> "NULL";
+
+        case "A" -> "VALUE A";
+
+        case "B" -> "VALUE B";
+
+        default -> "OTHER";
+    };
+
+PATTERN MATCHING + null
+
+    static String describe(Object obj) {
+
+        return switch (obj) {
+
+            case null ->
+                "Object is null";
+
+            case String s ->
+                "String: " + s;
+
+            case Integer i ->
+                "Integer: " + i;
+
+            default ->
+                "Other object";
+        };
+    }
+
+The benefit is that null handling and type handling can be expressed in
+one switch rather than nesting an if statement around a switch.
+
+
+======================================================================
+5. PRIVATE METHODS IN INTERFACES
+======================================================================
+
+Private interface methods were introduced in Java 9.
+
+Interfaces can contain:
+- abstract methods
+- default methods
+- static methods
+- private methods
+
+Private methods allow default or static methods to share implementation
+logic without exposing the helper to implementing classes.
+
+WITHOUT A PRIVATE METHOD
+
+    public interface Report {
+
+        default void generateDailyReport() {
+            System.out.println("Opening report");
+            System.out.println("Validating data");
+            System.out.println("Daily report");
+        }
+
+        default void generateMonthlyReport() {
+            System.out.println("Opening report");
+            System.out.println("Validating data");
+            System.out.println("Monthly report");
+        }
+    }
+
+USING A PRIVATE METHOD
+
+    public interface Report {
+
+        default void generateDailyReport() {
+            startReport();
+            System.out.println("Daily report");
+        }
+
+        default void generateMonthlyReport() {
+            startReport();
+            System.out.println("Monthly report");
+        }
+
+        private void startReport() {
+            System.out.println("Opening report");
+            System.out.println("Validating data");
+        }
+    }
+
+The private method:
+- is accessible only inside the interface
+- is not inherited by implementing classes
+- can be called by interface default/static methods
+
+BANKING EXAMPLE
+
+    public interface BankReport {
+
+        default void dailyReport() {
+            prepare();
+            System.out.println("Daily banking report");
+        }
+
+        default void monthlyReport() {
+            prepare();
+            System.out.println("Monthly banking report");
+        }
+
+        private void prepare() {
+            System.out.println("Loading account data");
+            System.out.println("Validating transactions");
+        }
+    }
+
+
+======================================================================
+6. var KEYWORD
+======================================================================
+
+Java 10 introduced local variable type inference using var.
+
+    var name = "Praveen";
+
+The compiler infers String.
+
+    var age = 46;
+
+The compiler infers int.
+
+IMPORTANT: var is NOT dynamic typing.
+
+    var x = 100;
+    x = "Hello";       // compile-time error
+
+Java remains statically typed. The inferred type is determined at compile
+time.
+
+WHERE var CAN BE USED
+
+    var name = "Praveen";
+    var age = 46;
+    var salary = 85000.50;
+    var employees = new ArrayList<String>();
+    var customer = new Customer();
+
+Enhanced for:
+
+    var employees = List.of("Ravi", "Sita", "John");
+
+    for (var employee : employees) {
+        System.out.println(employee);
+    }
+
+Try-with-resources:
+
+    try (var scanner = new Scanner(System.in)) {
+        // use scanner
+    }
+
+WHERE var CANNOT BE USED
+
+Fields:
+
+    class Employee {
+        var name;       // INVALID
+    }
+
+Method return type:
+
+    public var getName() {  // INVALID
+        return name;
+    }
+
+Method parameter:
+
+    public void test(var value) {  // INVALID
+    }
+
+var REQUIRES AN INITIALIZER
+
+    var x;              // INVALID
+    var x = 100;        // VALID
+
+var WITH null
+
+    var value = null;   // INVALID
+
+The compiler cannot infer a type from null alone.
+
+Use:
+
+    String value = null;
+
+WHEN TO USE var
+
+Good:
+
+    var customer = new Customer();
+
+The initializer makes the type obvious.
+
+Potentially less readable:
+
+    var data = getData();
+
+If the return type is not obvious, explicit typing may be clearer.
+Use var to reduce unnecessary repetition, not to hide important type
+information.
+
+
+======================================================================
+7. MODERN STRING METHODS
+======================================================================
+
+Important modern String methods include:
+- isBlank()
+- lines()
+- strip()
+- stripLeading()
+- stripTrailing()
+- repeat()
+- indent()
+- transform()
+- formatted()
+- translateEscapes()
+- stripIndent()
+
+isBlank()
+
+    String s1 = "";
+    String s2 = "   ";
+    String s3 = "  Hello  ";
+
+    System.out.println(s1.isBlank());   // true
+    System.out.println(s2.isBlank());   // true
+    System.out.println(s3.isBlank());   // false
+
+isEmpty() checks only length == 0.
+isBlank() also treats whitespace-only strings as blank.
+
+strip()
+
+    String value = "   Hello Java   ";
+    System.out.println(value.strip());
+
+Output:
+
+    Hello Java
+
+strip() removes leading and trailing Unicode-aware whitespace.
+
+stripLeading()
+
+    String value = "   Hello Java   ";
+    System.out.println(value.stripLeading());
+
+Removes leading whitespace only.
+
+stripTrailing()
+
+    String value = "   Hello Java   ";
+    System.out.println(value.stripTrailing());
+
+Removes trailing whitespace only.
+
+strip() versus trim()
+
+trim() is the older method. strip() provides Unicode-aware whitespace
+handling and is generally preferable for modern code when that distinction
+matters.
+
+repeat()
+
+    String separator = "-";
+    System.out.println(separator.repeat(10));
+
+Output:
+
+    ----------
+
+Useful for console formatting:
+
+    System.out.println("=".repeat(50));
+
+lines()
+
+    String text = "Java\nSpring\nMicroservices\nDocker";
+
+    text.lines()
+        .forEach(System.out::println);
+
+lines() returns a Stream<String> representing the lines.
+
+transform()
+
+    String name = "  praveen  ";
+
+    String result = name
+            .transform(String::strip)
+            .transform(String::toUpperCase);
+
+    System.out.println(result);
+
+Output:
+
+    PRAVEEN
+
+formatted()
+
+    String name = "Praveen";
+    int age = 46;
+
+    String message =
+        "Name: %s, Age: %d".formatted(name, age);
+
+Output:
+
+    Name: Praveen, Age: 46
+
+indent()
+
+    String text = "Java\nSpring\nDocker";
+
+    System.out.println(text.indent(4));
+
+Adds indentation to each line.
+
+stripIndent()
+
+    String text = "Java\n  Spring\n    Docker";
+
+    System.out.println(text.stripIndent());
+
+Removes incidental indentation.
+
+translateEscapes()
+
+    String value = "Hello\\nWorld";
+
+    System.out.println(value.translateEscapes());
+
+Output:
+
+    Hello
+    World
+
+It interprets escape sequences represented as characters in the String.
+
+
+======================================================================
+8. LOCAL VARIABLE SYNTAX IN LAMBDA EXPRESSIONS
+======================================================================
+
+Lambda parameter types can normally be inferred:
+
+    (x) -> x * 2
+
+They can also be explicitly typed:
+
+    (int x) -> x * 2
+
+Multiple parameters:
+
+    (a, b) -> a + b
+
+or:
+
+    (int a, int b) -> a + b
+
+JAVA 11: var IN LAMBDA PARAMETERS
+
+    (var x) -> x * 2
+
+Multiple parameters:
+
+    (var a, var b) -> a + b
+
+WHY USE var IN LAMBDAS?
+
+One important reason is that it allows annotations on implicitly typed
+lambda parameters.
+
+Example:
+
+    (@Deprecated var value) -> value
+
+In real applications, a suitable annotation library can be used:
+
+    (@NonNull var name) -> name.toUpperCase()
+
+The exact annotation depends on the library/framework.
+
+IMPORTANT CONSISTENCY RULE
+
+If var is used, it must be used for every parameter.
+
+Valid:
+
+    (var a, var b) -> a + b
+
+Invalid:
+
+    (var a, b) -> a + b
+
+Invalid:
+
+    (var a, int b) -> a + b
+
+Valid without var:
+
+    (a, b) -> a + b
+
+Valid with explicit types:
+
+    (int a, int b) -> a + b
+
+
+======================================================================
+9. COMPLETE COMBINED EXAMPLE
+======================================================================
+
+    import java.util.List;
+
+    public class ModernJavaDemo {
+
+        public static void main(String[] args) {
+
+            List<Customer> customers = List.of(
+                new Customer(101, "Praveen", "HYDERABAD"),
+                new Customer(102, "Ravi", "BANGALORE"),
+                new Customer(103, "Sita", "CHENNAI")
+            );
+
+            customers.forEach(
+                (var customer) ->
+                    System.out.println(
+                        customer.id() + " - " + customer.name()
+                    )
+            );
+
+            Object value = "Hello Java";
+
+            String result = switch (value) {
+
+                case null ->
+                    "NULL VALUE";
+
+                case String s ->
+                    "String length: " + s.length();
+
+                default ->
+                    "Other type";
+            };
+
+            System.out.println(result);
+        }
+    }
+
+    public record Customer(
+        int id,
+        String name,
+        String city
+    ) {
+    }
+
+This demonstrates:
+1. Customer is a record.
+2. Record accessors are id(), name(), city().
+3. var is used in a lambda parameter.
+4. switch uses pattern matching.
+5. switch explicitly handles null.
+
+
+======================================================================
+10. COMPLETE BANKING EXAMPLE
+======================================================================
+
+This combines records, sealed interfaces, pattern matching, null in switch,
+var, String methods, and var in lambda syntax.
+
+    import java.util.List;
+
+    public class BankingModernJavaDemo {
+
+        public static void main(String[] args) {
+
+            var payments = List.of(
+                new CardPayment(5000),
+                new UpiPayment(2500),
+                new CashPayment(1000)
+            );
+
+            payments.forEach(
+                (var payment) ->
+                    System.out.println(processPayment(payment))
+            );
+
+            String customerName = "   praveen kumar   ";
+
+            String formattedName = customerName
+                    .strip()
+                    .toUpperCase();
+
+            System.out.println(formattedName);
+
+            String value = null;
+
+            System.out.println(describe(value));
+        }
+
+        static String processPayment(Payment payment) {
+
+            return switch (payment) {
+
+                case CardPayment c ->
+                    "Card payment: Rs." + c.amount();
+
+                case UpiPayment u ->
+                    "UPI payment: Rs." + u.amount();
+
+                case CashPayment c ->
+                    "Cash payment: Rs." + c.amount();
+            };
+        }
+
+        static String describe(String value) {
+
+            return switch (value) {
+
+                case null ->
+                    "Customer name is null";
+
+                case String s ->
+                    "Customer name: " + s;
+            };
+        }
+    }
+
+    sealed interface Payment
+            permits CardPayment, UpiPayment, CashPayment {
+    }
+
+    record CardPayment(double amount)
+            implements Payment {
+    }
+
+    record UpiPayment(double amount)
+            implements Payment {
+    }
+
+    record CashPayment(double amount)
+            implements Payment {
+    }
+
+Explanation:
+Payment is a sealed interface. Only the permitted payment types can
+implement it. Each payment is a record. processPayment() uses pattern
+matching with switch. Because the hierarchy is sealed and all permitted
+types are handled, the switch is exhaustive. The lambda uses var. String
+processing uses strip() and toUpperCase(). The second switch explicitly
+handles null.
+
+
+======================================================================
+11. INTERVIEW QUESTIONS
+======================================================================
+
+Q1. What is a record?
+A record is a concise data-carrier class declaration with generated
+constructor, accessors, equals(), hashCode(), and toString().
+
+Q2. Are records completely immutable?
+Record components are final, but immutability is shallow. A referenced
+mutable object can still be modified.
+
+Q3. Can a record extend another class?
+No. A record implicitly extends java.lang.Record.
+
+Q4. Can a record implement an interface?
+Yes.
+
+Q5. What is a sealed class?
+A type that restricts which types can directly extend or implement it.
+
+Q6. What modifiers can permitted subclasses have?
+final, sealed, or non-sealed.
+
+Q7. What is pattern matching?
+It combines type checking with variable binding and enables type-based
+matching in modern switch.
+
+Q8. Can modern switch handle null?
+Yes, explicitly with case null.
+
+Q9. Why are private methods allowed in interfaces?
+They let interface default/static methods share implementation helpers
+without exposing those helpers to implementing classes.
+
+Q10. Is var dynamic typing?
+No. Java remains statically typed and the type is inferred at compile time.
+
+Q11. Where can var be used?
+Local variables, enhanced-for variables, and try-with-resources. Not fields,
+method parameters, or return types.
+
+Q12. Can you write var x = null?
+No, because the compiler cannot infer the type.
+
+Q13. Difference between isEmpty() and isBlank()?
+isEmpty() means length zero. isBlank() also accepts whitespace-only strings.
+
+Q14. Difference between trim() and strip()?
+strip() provides Unicode-aware whitespace handling; trim() is older.
+
+Q15. Why use var in lambda parameters?
+It enables inferred parameter syntax while allowing parameter annotations.
+
+Q16. Can lambda parameters mix var and explicit types?
+No.
+
+
+======================================================================
+12. QUICK COMPARISON TABLE
+======================================================================
+
+Feature                  Purpose
+----------------------------------------------------------------------
+Record                   Concise data carrier
+Sealed class/interface   Restrict inheritance/implementation
+instanceof pattern       Type check + variable binding
+Pattern switch           Type-based switch with pattern variables
+case null                Explicit null handling
+Private interface        Reusable internal interface logic
+var                      Local variable type inference
+isBlank()                Empty/whitespace-only check
+strip()                  Unicode-aware whitespace removal
+lines()                  Process multiline text as lines
+repeat()                 Repeat a String
+formatted()              String formatting
+transform()              Transform a String
+indent()                 Add indentation
+translateEscapes()       Interpret escape sequences
+var in lambda            Inferred lambda parameter syntax
+
+
+======================================================================
+13. TRAINING EXERCISES
+======================================================================
+
+Exercise 1 – Record
+Create an Employee record with id, name, department and salary. Create
+three employees, display them, add annualSalary(), and reject negative
+salary.
+
+Exercise 2 – Sealed Types
+Create:
+    sealed interface Notification
+with permitted:
+    EmailNotification
+    SMSNotification
+    PushNotification
+Use records for implementations.
+
+Exercise 3 – Pattern Matching
+Create a List<Object> containing String, Integer, Double and null. Use
+pattern matching to print type and value.
+
+Exercise 4 – Pattern switch
+Create a sealed Payment hierarchy with CardPayment, UpiPayment and
+CashPayment. Calculate a 2% card fee, 1% UPI fee, and 0% cash fee.
+
+Exercise 5 – null in switch
+Create getAccountType(String type). Handle SAVINGS, CURRENT, null, and
+invalid values.
+
+Exercise 6 – Private Interface Method
+Create BankReport with dailyReport() and monthlyReport(). Extract common
+validation into a private interface method.
+
+Exercise 7 – var
+Rewrite local declarations using var where appropriate. Do not use var for
+fields, parameters, or return types.
+
+Exercise 8 – String Methods
+Given:
+    String input = "   java programming   ";
+
+Check blank, strip whitespace, convert to uppercase, repeat twice, and
+display using formatted().
+
+Exercise 9 – Lambda var
+Create employees and use:
+    (var employee) -> ...
+
+Then explain why these are invalid:
+    (var a, b) -> a + b
+    (var a, int b) -> a + b
+
+
+======================================================================
+14. KEY TAKEAWAYS
+======================================================================
+
+1. Records reduce boilerplate for data-centric classes.
+2. Records are useful for DTOs, transactions, API responses and domain
+   values.
+3. Sealed classes/interfaces provide controlled inheritance.
+4. Pattern matching reduces explicit casting.
+5. Pattern matching works especially well with sealed hierarchies.
+6. Modern switch can explicitly handle null using case null.
+7. Private interface methods keep common helper logic inside the interface.
+8. var is compile-time type inference, not dynamic typing.
+9. Use var when the initializer makes the type obvious.
+10. Modern String methods reduce common text-processing boilerplate.
+11. Lambda parameters can use var in Java 11+.
+12. If var is used in a lambda parameter list, it must be used consistently.
+13. Records + sealed types + pattern matching + switch form a powerful
+    combination for modern Java domain modeling.

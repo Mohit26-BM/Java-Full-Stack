@@ -1,0 +1,15 @@
+package dao;
+
+import java.util.List;
+import model.Movie;
+
+public interface MovieDao {
+
+    public int addMovie(Movie movie);
+
+    public List<Movie> getMovies();
+
+    public List<Movie> searchMovie(String name);
+
+    public int deleteMovie(String name);
+}

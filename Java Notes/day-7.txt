@@ -1,0 +1,177 @@
+
+
+1. Database connectivity  -- JDBC (Hibernate, Spring JDBC, Spring Data Jpa)
+2. Reading the values from the UI  (MVC pattern)
+3. Dependency resolving
+4. Communication from one application to another( REST)
+5. Unit Testing (Junit)
+6. External Cloud // Queue
+
+Project --> Bussiness Logic code  + Infra structure related coding (60%)
+
+
+Frameworks -- It is a predefined flow for a task/functionality
+(PPT Template)
+
+Spring - java based framework for developing web applications
+Spring relies on two basic principles
+
+1. Dependency Injection (DI) - The process of injecting the
+dependent beans
+
+2. Inversion of Control (IoC) - Delegation of dependent object
+creation to the third party container
+
+
+
+Beans -- A java object managed by spring container
+
+In spring confg, is provided in 3 ways
+
+1. xml file  - Xml file -> Completely deprecated
+
+2. Java class -- java class
+
+3. Java Annoations
+
+
+Container -- BeanFactory (I) ( Life Cycle methods of Beans, 
+di, lazy loading)
+
+
+ApplicationContext (I) <----------- BeanFactory
+
+1. AOP
+2. Internatioinalization
+3. Event Based processing
+4. Eager Loading
+
+
+ApplicationContext
+
+ClassPathXmlApplicationContext (xml)
+FileSystemXmlApplicationContext (xml)
+WebXmlApplicationContext (xml)
+
+
+AnnotationConfigApplicationContext (Java or java annotations)
+
+
+Scope - referes to the no instances that were created
+
+1. singleton -- only instance for any no of calls
+2. prototype -- every time a new instance is created
+3. request -- for every http request a new instance is created
+4. session - for every new session it will create a new instance
+5. application -- for every new application context it will create a new
+instance
+
+To change the jdk version
+-------------------------
+right click on project --> build path --> configure build path
+---> select libraries tab --> click on add library --> select JRE System 
+library --> click on next --> select Alternative jre --> from the dropdown
+select the required version (jdk17) --> click finish --> apply --> apply and close
+
+
+Advantages of Springboot
+-------------------------
+1. Auto Configuration
+2. Spring starters 
+3. Embedded Server  - Tomcat (Jetty)
+4. public static void main- Entry point
+5. Test Env -Mockito, Junit
+
+
+Importing the maven project into eclipse workspace
+-------------------------------------------------
+file --> import --> search for maven ---> Existing maven project
+---> next --> browse for the project to the pom.xml location base folder -->
+select folder --> next --> finish
+
+
+
+springboot = spring + annotations - xml
+
+MVC Design pattern
+------------------
+
+
+
+<html>
+<body>
+
+	<table>	
+		<tr>
+			<td></td
+			<td></td>
+			<td></td>
+			<td>Price</td>	
+		</tr>
+		<tr>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>	
+		</tr>
+
+
+	</table>
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+client -------------------name---------------------- server
+		Request Object
+
+	<---------------------------------------
+		Response Object
+
+
+Reqeust Object -- http method + url pattern + request param + header + payload
+
+http methods --> get, post, put, delete, options, head, patch
+
+
+Model --> we can any no values, it won't specify the view name
+
+ModelAndView  -- one value and one view name will be specified
+
+
+
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome</title>
+</head>
+
+<body>
+
+    <h1>Welcome to Spring MVC</h1>
+
+    <h2>Hello, <span th:text="${name}"></span></h2>
+
+</body>
+
+</html>
+
+
+
+
+
+
+
