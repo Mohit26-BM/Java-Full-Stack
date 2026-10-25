@@ -18,19 +18,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-/**
- * Custom authentication-failure response for the REST API.
- *
- * Without this, a failed HTTP Basic login returns 401 with an EMPTY body and a
- * WWW-Authenticate header, which makes a browser show its own login pop-up.
- * API clients get a JSON body instead.
- *
- *   commence() - AuthenticationEntryPoint: not logged in, or wrong credentials -> 401
- *   handle()   - AccessDeniedHandler: logged in but not allowed           -> 403
- */
 @Component
 public class JsonSecurityErrorHandlers implements AuthenticationEntryPoint, AccessDeniedHandler {
-
     private final ObjectMapper objectMapper;
 
     public JsonSecurityErrorHandlers(ObjectMapper objectMapper) {
@@ -40,13 +29,10 @@ public class JsonSecurityErrorHandlers implements AuthenticationEntryPoint, Acce
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
                          AuthenticationException exception) throws IOException {
-        // BadCredentialsException = a username/password was sent but is wrong (wrong password
-        // OR unknown user - deliberately the same message). Otherwise nothing was sent at all.
         String message = exception instanceof BadCredentialsException
                 ? "Invalid username or password"
                 : "Authentication is required to access this resource";
-        // "Basic" tells the client which scheme to use. Without realm="..." most browsers do
-        // not open their pop-up, which suits an API consumed by JavaScript or Postman.
+
         response.setHeader("WWW-Authenticate", "Basic");
         write(response, HttpStatus.UNAUTHORIZED, message, request);
     }

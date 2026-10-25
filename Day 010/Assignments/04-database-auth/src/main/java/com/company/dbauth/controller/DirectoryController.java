@@ -9,10 +9,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.company.dbauth.dto.UserResponses.DirectoryEntry;
 import com.company.dbauth.service.AccountService;
 
-/** GET /api/directory needs EMPLOYEE_READ, a permission that comes from the user's roles in the database. */
 @RestController
 public class DirectoryController {
-
     private final AccountService accountService;
 
     public DirectoryController(AccountService accountService) {

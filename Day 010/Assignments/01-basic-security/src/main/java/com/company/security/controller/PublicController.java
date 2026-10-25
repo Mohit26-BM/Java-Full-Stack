@@ -7,11 +7,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/** Public status information: no login needed (permitAll for /api/public/**). */
 @RestController
 @RequestMapping("/api/public")
 public class PublicController {
-
     @GetMapping("/hello")
     public Map<String, Object> hello() {
         return Map.of("message", "Hello from the employee portal", "status", "UP", "time", Instant.now());

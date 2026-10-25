@@ -1,9 +1,3 @@
--- =====================================================================
--- V1_1: demo users (BCrypt cost 10). Passwords are listed in the README.
---   admin  ADMIN          hana  HR          manoj  MANAGER + USER (two roles)
---   asha   USER           vikram USER, DISABLED (left the company)
--- =====================================================================
-
 INSERT INTO users (username, email, full_name, password_hash, enabled, password_changed_at, created_at) VALUES
     ('admin',  'aditi.rao@company.com',     'Aditi Rao',     '$2a$10$kOgeb4kHaday1Qka07YUTOX7g41dLUctpUZvxlQEo5mN/fXnpz.E.', TRUE,  NOW(), NOW()),
     ('hana',   'hana.kapoor@company.com',   'Hana Kapoor',   '$2a$10$FJP1bozMttTspZngBiTZGOYMYnzxhFK256qNz7GSYqF71ibKjwNhC', TRUE,  NOW(), NOW()),

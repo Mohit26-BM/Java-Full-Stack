@@ -19,11 +19,9 @@ import com.company.dbauth.service.UserAdminService;
 
 import jakarta.validation.Valid;
 
-/** /api/admin/** needs the USER_MANAGE permission (only the ADMIN role has it). */
 @RestController
 @RequestMapping("/api/admin/users")
 public class AdminUserController {
-
     private final UserAdminService userAdminService;
 
     public AdminUserController(UserAdminService userAdminService) {

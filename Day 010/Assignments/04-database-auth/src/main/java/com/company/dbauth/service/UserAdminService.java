@@ -18,14 +18,8 @@ import com.company.dbauth.exception.ApiException;
 import com.company.dbauth.repository.AppUserRepository;
 import com.company.dbauth.repository.RoleRepository;
 
-/**
- * User administration (USER_MANAGE permission). Every change is in the
- * database, and HTTP Basic loads the user again on EVERY request, so a disabled
- * account or a removed role takes effect on the very next request.
- */
 @Service
 public class UserAdminService {
-
     private final AppUserRepository users;
     private final RoleRepository roles;
     private final Clock clock;
@@ -42,7 +36,6 @@ public class UserAdminService {
         return users.findAllByOrderByUsernameAsc().stream().map(u -> UserResponse.of(u, now)).toList();
     }
 
-    /** An admin cannot disable their own account (and so lock everybody out by mistake). */
     @Transactional
     public UserResponse setEnabled(Long id, boolean enabled, String actingUsername) {
         AppUser user = find(id);
@@ -60,7 +53,6 @@ public class UserAdminService {
         return UserResponse.of(user, LocalDateTime.now(clock));
     }
 
-    /** Replaces the user's roles. Every name must exist in the roles table. */
     @Transactional
     public UserResponse replaceRoles(Long id, Set<String> roleNames) {
         AppUser user = find(id);

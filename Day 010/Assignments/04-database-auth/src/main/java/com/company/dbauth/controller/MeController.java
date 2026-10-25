@@ -16,14 +16,9 @@ import com.company.dbauth.service.AccountService;
 
 import jakarta.validation.Valid;
 
-/**
- * The logged-in user. @AuthenticationPrincipal injects the PortalUserPrincipal
- * that DatabaseUserDetailsService built for this request.
- */
 @RestController
 @RequestMapping("/api/me")
 public class MeController {
-
     private final AccountService accountService;
 
     public MeController(AccountService accountService) {

@@ -7,10 +7,8 @@ import org.springframework.stereotype.Service;
 
 import com.company.security.model.Employee;
 
-/** Read-only employee data for the portal. */
 @Service
 public class EmployeeService {
-
     private final List<Employee> employees = List.of(
             new Employee(1L, "Asha Verma", "Engineering", "Software Engineer"),
             new Employee(2L, "Ravi Iyer", "Engineering", "Team Lead"),

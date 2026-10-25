@@ -9,18 +9,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.company.methodsec.dto.EmployeeResponses.SalaryResponse;
 import com.company.methodsec.service.EmployeeService;
 
-/**
- * "Another controller exposes them": a second entry point, imagine one added
- * later by another team, which calls the SAME sensitive service methods.
- *
- * SecurityConfig has no specific rule for /api/tools/**, only "authenticated".
- * The DELETE rule for /api/employees/** does not cover it either, and this is a
- * POST. With URL security alone, any logged-in user could read every salary and
- * delete employees here. The method rules on EmployeeService still stop them.
- */
 @RestController
 public class HrToolsController {
-
     private final EmployeeService employeeService;
 
     public HrToolsController(EmployeeService employeeService) {

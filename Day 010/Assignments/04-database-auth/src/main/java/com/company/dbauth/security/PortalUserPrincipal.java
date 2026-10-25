@@ -6,17 +6,7 @@ import java.util.List;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-/**
- * What Spring Security keeps about a logged-in user: an immutable COPY of the
- * database row, made by DatabaseUserDetailsService. It is detached from JPA, so
- * nothing is lazily loaded later and the entity never leaves the service layer.
- *
- * The flags are read by DaoAuthenticationProvider during login:
- *   isEnabled() false        -> DisabledException (401 "Account is disabled")
- *   isAccountNonLocked() false -> LockedException (401 "Account is temporarily locked")
- */
 public final class PortalUserPrincipal implements UserDetails {
-
     private final Long id;
     private final String username;
     private final String passwordHash;
@@ -71,6 +61,6 @@ public final class PortalUserPrincipal implements UserDetails {
 
     @Override
     public String toString() {
-        return "PortalUserPrincipal[" + username + ", " + authorities + "]";     // never prints the hash
+        return "PortalUserPrincipal[" + username + ", " + authorities + "]";
     }
 }

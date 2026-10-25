@@ -20,13 +20,8 @@ import com.company.methodsec.service.EmployeeService;
 
 import jakarta.validation.Valid;
 
-/**
- * The main HR API. No authorization code here: the URL chain only requires a
- * login (plus ADMIN for DELETE), and each service method enforces its own rule.
- */
 @RestController
 public class EmployeeController {
-
     private final EmployeeService employeeService;
 
     public EmployeeController(EmployeeService employeeService) {

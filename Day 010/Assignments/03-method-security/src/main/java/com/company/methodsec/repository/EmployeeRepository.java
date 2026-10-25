@@ -11,20 +11,14 @@ import org.springframework.stereotype.Repository;
 
 import com.company.methodsec.model.Employee;
 
-/**
- * Plain in-memory storage with NO security. Only EmployeeService (secured) and
- * EmployeeAccess (the rule helper) use it; controllers never do.
- */
 @Repository
 public class EmployeeRepository {
-
     private final Map<Long, Employee> employees = new ConcurrentHashMap<>();
 
     public EmployeeRepository() {
         resetToSampleData();
     }
 
-    /** Puts the seven sample employees back (used at startup and by the tests). */
     public final void resetToSampleData() {
         employees.clear();
         List.of(

@@ -13,18 +13,8 @@ import com.company.methodsec.dto.ErrorResponse;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-/**
- * Controller errors (400, 404) in the same JSON shape as the security errors.
- *
- * There is deliberately NO handler for AccessDeniedException (or a catch-all
- * Exception handler). A denial thrown by method security must travel up out of
- * Spring MVC to the ExceptionTranslationFilter, which calls the
- * AccessDeniedHandler (403 JSON). A catch-all here would swallow it and turn
- * every denial into a 500.
- */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
     @ExceptionHandler(EmployeeNotFoundException.class)
     public ResponseEntity<ErrorResponse> notFound(EmployeeNotFoundException ex, HttpServletRequest request) {
         return error(HttpStatus.NOT_FOUND, ex.getMessage(), request);

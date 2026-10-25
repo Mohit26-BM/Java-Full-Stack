@@ -20,17 +20,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-/**
- * 401 / 403 as JSON. The 401 message depends on WHY the login failed:
- *
- *   BadCredentialsException  wrong password OR unknown user (deliberately the same text)
- *   DisabledException        users.enabled = false
- *   LockedException          users.locked_until is in the future
- *   anything else            no credentials were sent
- */
 @Component
 public class JsonSecurityErrorHandlers implements AuthenticationEntryPoint, AccessDeniedHandler {
-
     private final ObjectMapper objectMapper;
 
     public JsonSecurityErrorHandlers(ObjectMapper objectMapper) {

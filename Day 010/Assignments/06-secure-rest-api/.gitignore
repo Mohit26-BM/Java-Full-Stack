@@ -1,0 +1,6 @@
+# Build output
+target/
+
+# Contain the MySQL password and the JWT signing keys
+src/main/resources/db-secret.properties
+src/main/resources/jwt-secret.properties

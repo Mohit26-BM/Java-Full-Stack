@@ -7,11 +7,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-/** A fine-grained permission, e.g. EMPLOYEE_READ. Becomes an authority WITHOUT a prefix. */
 @Entity
 @Table(name = "permissions")
 public class Permission {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

@@ -13,16 +13,9 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 
-/**
- * A role, e.g. HR. The name is stored WITHOUT the ROLE_ prefix (a CHECK
- * constraint refuses "ROLE_HR"); the prefix is added when the authorities are built.
- *
- * Many-to-many with Permission through the role_permissions table.
- */
 @Entity
 @Table(name = "roles")
 public class Role {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

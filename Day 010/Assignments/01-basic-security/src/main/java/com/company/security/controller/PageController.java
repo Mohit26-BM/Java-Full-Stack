@@ -9,17 +9,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.HtmlUtils;
 
-/**
- * Browser pages for the form-login flow: home, the CUSTOM login page and the
- * admin dashboard. The HTML is written inline to avoid a template engine.
- *
- * The login and logout forms both contain the CSRF token as a hidden field.
- * Spring Security puts the token in a request attribute; Spring MVC hands it to
- * these methods as a CsrfToken parameter.
- */
 @Controller
 public class PageController {
-
     @GetMapping(value = "/", produces = MediaType.TEXT_HTML_VALUE)
     @ResponseBody
     public String home() {
@@ -37,7 +28,6 @@ public class PageController {
                         CsrfToken csrf) {
         String message = "";
         if (error != null) {
-            // Custom failure response: one message for "unknown user" and "wrong password"
             message = "<p class=\"msg error\" role=\"alert\">Invalid username or password.</p>";
         } else if (logout != null) {
             message = "<p class=\"msg ok\" role=\"status\">You have been logged out.</p>";

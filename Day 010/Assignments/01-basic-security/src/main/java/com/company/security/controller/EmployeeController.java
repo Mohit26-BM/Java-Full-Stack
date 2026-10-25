@@ -12,14 +12,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.company.security.model.Employee;
 import com.company.security.service.EmployeeService;
 
-/**
- * Employee data: requires authentication (/api/employees/**), except the
- * public head count, which shows why matcher ORDER matters (see SecurityConfig).
- */
 @RestController
 @RequestMapping("/api/employees")
 public class EmployeeController {
-
     private final EmployeeService employeeService;
 
     public EmployeeController(EmployeeService employeeService) {
@@ -36,7 +31,6 @@ public class EmployeeController {
         return ResponseEntity.of(employeeService.findById(id));
     }
 
-    /** Public: matched by a permitAll rule placed BEFORE the general /api/employees/** rule. */
     @GetMapping("/count")
     public Map<String, Integer> count() {
         return Map.of("employees", employeeService.count());

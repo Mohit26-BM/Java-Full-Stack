@@ -21,22 +21,8 @@ import com.company.dbauth.entity.Permission;
 import com.company.dbauth.entity.Role;
 import com.company.dbauth.repository.AppUserRepository;
 
-/**
- * Loads a user from MySQL during login.
- *
- * Spring Security calls loadUserByUsername() with the username from the
- * request (HTTP Basic header). This method only LOADS; it never compares
- * passwords. DaoAuthenticationProvider then checks the account flags and
- * compares the typed password with the BCrypt hash returned here.
- *
- * Database roles and permissions become GrantedAuthority strings:
- *   role HR                         -> ROLE_HR
- *   permissions of HR (role_permissions) -> EMPLOYEE_READ, EMPLOYEE_WRITE
- * A user with several roles gets the UNION of their permissions (no duplicates).
- */
 @Service
 public class DatabaseUserDetailsService implements UserDetailsService {
-
     private final AppUserRepository users;
     private final Clock clock;
 
@@ -49,7 +35,7 @@ public class DatabaseUserDetailsService implements UserDetailsService {
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) {
         AppUser user = users.findWithAuthoritiesByUsername(username.toLowerCase(Locale.ROOT))
-                .orElseThrow(() -> new UsernameNotFoundException("No user " + username));   // reported as "Bad credentials"
+                .orElseThrow(() -> new UsernameNotFoundException("No user " + username));
 
         return new PortalUserPrincipal(
                 user.getId(),
@@ -63,7 +49,7 @@ public class DatabaseUserDetailsService implements UserDetailsService {
 
     static List<GrantedAuthority> authoritiesOf(AppUser user) {
         Set<String> roleNames = new TreeSet<>();
-        Set<String> permissionNames = new TreeSet<>();               // a Set: HR and USER both grant EMPLOYEE_READ
+        Set<String> permissionNames = new TreeSet<>();
         for (Role role : user.getRoles()) {
             roleNames.add("ROLE_" + role.getName());
             for (Permission permission : role.getPermissions()) {

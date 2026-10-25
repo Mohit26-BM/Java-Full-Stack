@@ -1,15 +1,6 @@
--- =====================================================================
--- V1: users, roles and permissions
---
---   users ──< user_roles >── roles ──< role_permissions >── permissions
---
--- A user has many roles, a role has many permissions (both many-to-many).
--- A user's authorities = ROLE_<role> for each role + every permission of those roles.
--- =====================================================================
-
 CREATE TABLE roles (
     id          BIGINT       NOT NULL AUTO_INCREMENT,
-    name        VARCHAR(30)  NOT NULL,                  -- ADMIN, HR ... (WITHOUT the ROLE_ prefix)
+    name        VARCHAR(30)  NOT NULL,
     description VARCHAR(200) NOT NULL,
     CONSTRAINT pk_roles PRIMARY KEY (id),
     CONSTRAINT uq_roles_name UNIQUE (name),
@@ -18,7 +9,7 @@ CREATE TABLE roles (
 
 CREATE TABLE permissions (
     id          BIGINT       NOT NULL AUTO_INCREMENT,
-    name        VARCHAR(50)  NOT NULL,                  -- EMPLOYEE_READ ...
+    name        VARCHAR(50)  NOT NULL,
     description VARCHAR(200) NOT NULL,
     CONSTRAINT pk_permissions PRIMARY KEY (id),
     CONSTRAINT uq_permissions_name UNIQUE (name)
@@ -34,20 +25,20 @@ CREATE TABLE role_permissions (
 
 CREATE TABLE users (
     id                    BIGINT       NOT NULL AUTO_INCREMENT,
-    username              VARCHAR(30)  NOT NULL,        -- stored in lower case
-    email                 VARCHAR(120) NOT NULL,        -- stored in lower case
+    username              VARCHAR(30)  NOT NULL,
+    email                 VARCHAR(120) NOT NULL,
     full_name             VARCHAR(80)  NOT NULL,
-    password_hash         CHAR(60)     NOT NULL,        -- a BCrypt hash is always 60 characters
+    password_hash         CHAR(60)     NOT NULL,
     enabled               BOOLEAN      NOT NULL DEFAULT TRUE,
     failed_login_attempts INT          NOT NULL DEFAULT 0,
-    locked_until          DATETIME     NULL,            -- NULL = not locked
+    locked_until          DATETIME     NULL,
     password_changed_at   DATETIME     NOT NULL,
     created_at            DATETIME     NOT NULL,
     CONSTRAINT pk_users PRIMARY KEY (id),
-    -- duplicates are refused by the DATABASE too, not only by the registration code
+
     CONSTRAINT uq_users_username UNIQUE (username),
     CONSTRAINT uq_users_email UNIQUE (email),
-    -- the database itself refuses anything that is not a BCrypt hash ($2a$, $2b$ or $2y$ + cost)
+
     CONSTRAINT ck_users_password_is_bcrypt CHECK (password_hash REGEXP '^\\$2[aby]\\$[0-9]{2}\\$'),
     CONSTRAINT ck_users_failed_attempts CHECK (failed_login_attempts >= 0)
 );
@@ -60,7 +51,6 @@ CREATE TABLE user_roles (
     CONSTRAINT fk_user_roles_role FOREIGN KEY (role_id) REFERENCES roles (id)
 );
 
--- Reference data: the roles and permissions the application knows about.
 INSERT INTO permissions (name, description) VALUES
     ('EMPLOYEE_READ',   'Read the staff directory'),
     ('EMPLOYEE_WRITE',  'Create and update employee records'),

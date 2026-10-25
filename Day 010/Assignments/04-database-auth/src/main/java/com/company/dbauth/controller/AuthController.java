@@ -21,11 +21,9 @@ import com.company.dbauth.service.PasswordResetService;
 
 import jakarta.validation.Valid;
 
-/** Public endpoints (permitAll): registration and password reset. */
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
-
     private static final String RESET_MESSAGE =
             "If an active account uses this e-mail address, a reset link has been sent";
 
@@ -46,12 +44,11 @@ public class AuthController {
         return ResponseEntity.created(URI.create("/api/admin/users/" + created.id())).body(created);
     }
 
-    /** Always 202 with the same message, whether or not the e-mail exists. */
     @PostMapping("/password-reset/request")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public ResetRequested requestReset(@Valid @RequestBody ResetRequest request) {
         String token = passwordResetService.request(request.email())
-                .filter(t -> properties.returnResetToken())          // demo only: no mail server
+                .filter(t -> properties.returnResetToken())
                 .orElse(null);
         return new ResetRequested(RESET_MESSAGE, token);
     }

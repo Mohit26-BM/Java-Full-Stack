@@ -14,18 +14,9 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 
-/**
- * A login account (table users). Named AppUser so it is not confused with
- * Spring Security's own User class.
- *
- * The entity is NEVER handed to Spring Security or returned as JSON: the
- * UserDetailsService copies what it needs into a PortalUserPrincipal, and the
- * controllers return DTOs. So the password hash cannot leak by accident.
- */
 @Entity
 @Table(name = "users")
 public class AppUser {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -75,7 +66,6 @@ public class AppUser {
         this.createdAt = now;
     }
 
-    /** Locked while lockedUntil is in the future; the lock ends by itself afterwards. */
     public boolean isLockedAt(LocalDateTime now) {
         return lockedUntil != null && lockedUntil.isAfter(now);
     }

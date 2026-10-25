@@ -13,16 +13,8 @@ import com.company.rbac.dto.ErrorResponse;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-/**
- * Controller errors (400, 404) in the same JSON shape as the security errors.
- *
- * These only happen AFTER authorization succeeded: the security filters run
- * before any controller, so a 404 here means "you were allowed in, but the
- * employee does not exist".
- */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
     @ExceptionHandler(EmployeeNotFoundException.class)
     public ResponseEntity<ErrorResponse> notFound(EmployeeNotFoundException ex, HttpServletRequest request) {
         return error(HttpStatus.NOT_FOUND, ex.getMessage(), request);

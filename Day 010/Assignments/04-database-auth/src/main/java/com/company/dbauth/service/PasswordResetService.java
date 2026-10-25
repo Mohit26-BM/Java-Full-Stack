@@ -24,21 +24,8 @@ import com.company.dbauth.exception.ApiException;
 import com.company.dbauth.repository.AppUserRepository;
 import com.company.dbauth.repository.PasswordResetTokenRepository;
 
-/**
- * "Forgot my password" in two steps:
- *
- *   1. request(email)  -> a random one-time token, valid 15 minutes. Its SHA-256
- *                         hash is stored; the token itself would be e-mailed.
- *   2. confirm(token, newPassword) -> the password is replaced, the token is
- *                         marked used, and any login lock is cleared.
- *
- * Why SHA-256 for the token but BCrypt for passwords? The token is 256 random
- * bits, impossible to guess, so a fast hash is enough. Passwords are chosen by
- * people and guessable, so they need a deliberately slow hash.
- */
 @Service
 public class PasswordResetService {
-
     private static final Logger log = LoggerFactory.getLogger(PasswordResetService.class);
 
     private final SecureRandom random = new SecureRandom();
@@ -57,11 +44,6 @@ public class PasswordResetService {
         this.clock = clock;
     }
 
-    /**
-     * Returns the raw token (to be e-mailed), or empty if the e-mail is unknown or
-     * the account is disabled. The CONTROLLER answers the same in both cases, so
-     * the endpoint cannot be used to find out which e-mail addresses exist.
-     */
     @Transactional
     public Optional<String> request(String email) {
         Optional<AppUser> user = users.findByEmail(email.toLowerCase(Locale.ROOT)).filter(AppUser::isEnabled);
@@ -84,7 +66,7 @@ public class PasswordResetService {
                 .filter(t -> t.isUsableAt(now))
                 .orElseThrow(() -> ApiException.badRequest("Reset token is invalid, expired or already used"));
         reset.markUsed(now);
-        reset.getUser().changePassword(passwordEncoder.encode(newPassword), now);   // also clears a lock
+        reset.getUser().changePassword(passwordEncoder.encode(newPassword), now);
     }
 
     static String sha256(String value) {

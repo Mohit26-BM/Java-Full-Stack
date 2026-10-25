@@ -2,9 +2,7 @@ package com.company.dbauth.exception;
 
 import org.springframework.http.HttpStatus;
 
-/** A business-rule failure with the HTTP status it should produce. */
 public class ApiException extends RuntimeException {
-
     private final HttpStatus status;
 
     public ApiException(HttpStatus status, String message) {

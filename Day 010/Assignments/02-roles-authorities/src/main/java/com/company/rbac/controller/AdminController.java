@@ -8,10 +8,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.company.rbac.security.PortalUserDetailsService;
 
-/** User administration: /api/admin/** is hasRole("ADMIN"). Never returns password hashes. */
 @RestController
 public class AdminController {
-
     private final PortalUserDetailsService users;
 
     public AdminController(PortalUserDetailsService users) {

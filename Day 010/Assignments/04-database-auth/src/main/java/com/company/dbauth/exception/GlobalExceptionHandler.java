@@ -14,10 +14,8 @@ import com.company.dbauth.dto.ErrorResponse;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-/** Controller errors (400, 404, 409) in the same JSON shape as the security errors. */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
     @ExceptionHandler(ApiException.class)
     public ResponseEntity<ErrorResponse> api(ApiException ex, HttpServletRequest request) {
         return error(ex.getStatus(), ex.getMessage(), request);

@@ -15,14 +15,8 @@ import com.company.rbac.dto.EmployeeRequest;
 import com.company.rbac.exception.EmployeeNotFoundException;
 import com.company.rbac.model.Employee;
 
-/**
- * Employee records in memory (thread-safe map). No security code here: in this
- * project every rule lives in SecurityConfig, at the URL level. (The
- * method-security project moves rules onto service methods.)
- */
 @Service
 public class EmployeeService {
-
     private final Map<Long, Employee> employees = new ConcurrentHashMap<>();
     private final AtomicLong nextId = new AtomicLong(1);
 
@@ -50,7 +44,6 @@ public class EmployeeService {
         return employee;
     }
 
-    /** Direct reports of one manager. */
     public List<Employee> findTeam(Long managerId) {
         return findAll().stream().filter(e -> managerId.equals(e.managerId())).toList();
     }
@@ -80,7 +73,6 @@ public class EmployeeService {
         }
     }
 
-    /** Head count per department, sorted by department name. */
     public Map<String, Long> headcountByDepartment() {
         return employees.values().stream()
                 .collect(Collectors.groupingBy(Employee::department, TreeMap::new, Collectors.counting()));

@@ -8,9 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
-/** Request bodies. */
 public final class EmployeeRequests {
-
     private EmployeeRequests() {
     }
 

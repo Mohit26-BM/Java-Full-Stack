@@ -15,24 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.company.dbauth.config.PortalSecurityProperties;
 import com.company.dbauth.repository.AppUserRepository;
 
-/**
- * Account locking.
- *
- * Spring Security PUBLISHES an event after every authentication attempt
- * (DefaultAuthenticationEventPublisher, registered by Spring Boot). This
- * listener reacts to them:
- *
- *   wrong password -> failed_login_attempts + 1; at the limit, locked_until = now + lock duration
- *   success        -> the counter goes back to 0
- *
- * While locked_until is in the future the principal reports
- * isAccountNonLocked() = false, so even the CORRECT password is refused. The
- * lock ends by itself; an admin (POST /api/admin/users/{id}/unlock) or a
- * password reset can end it early.
- */
 @Component
 public class LoginAttemptListener {
-
     private static final Logger log = LoggerFactory.getLogger(LoginAttemptListener.class);
 
     private final AppUserRepository users;
@@ -48,7 +32,6 @@ public class LoginAttemptListener {
     @EventListener
     @Transactional
     public void onBadCredentials(AuthenticationFailureBadCredentialsEvent event) {
-        // unknown usernames also end here (as "bad credentials"); there is nothing to count for them
         users.findByUsername(event.getAuthentication().getName().toLowerCase(Locale.ROOT)).ifPresent(user -> {
             LocalDateTime now = LocalDateTime.now(clock);
             user.recordFailedLogin(properties.maxFailedAttempts(), now.plus(properties.lockDuration()));
@@ -63,7 +46,7 @@ public class LoginAttemptListener {
     @Transactional
     public void onSuccess(AuthenticationSuccessEvent event) {
         users.findByUsername(event.getAuthentication().getName()).ifPresent(user -> {
-            if (user.getFailedLoginAttempts() > 0) {      // HTTP Basic logs in on every request: write only when needed
+            if (user.getFailedLoginAttempts() > 0) {
                 user.clearFailedLogins();
             }
         });

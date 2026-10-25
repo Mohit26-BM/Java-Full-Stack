@@ -19,11 +19,8 @@ import com.company.dbauth.exception.ApiException;
 import com.company.dbauth.repository.AppUserRepository;
 import com.company.dbauth.repository.RoleRepository;
 
-/** Registration, password change and the staff directory. */
 @Service
 public class AccountService {
-
-    /** Every self-registered account starts with the lowest role. Only an admin can give more. */
     static final String DEFAULT_ROLE = "USER";
 
     private final AppUserRepository users;
@@ -38,16 +35,9 @@ public class AccountService {
         this.clock = clock;
     }
 
-    /**
-     * Duplicates are checked twice:
-     *  1. existsBy...  gives a clear 409 message in the normal case;
-     *  2. the UNIQUE constraints in MySQL catch the rare case where two
-     *     registrations with the same name arrive at the same moment (both pass
-     *     step 1); saveAndFlush makes the INSERT happen here, inside the try.
-     */
     @Transactional
     public UserResponse register(RegistrationRequest request) {
-        String username = request.username().toLowerCase(Locale.ROOT);    // "Neha" and "neha" are the same account
+        String username = request.username().toLowerCase(Locale.ROOT);
         String email = request.email().toLowerCase(Locale.ROOT);
         if (users.existsByUsername(username)) {
             throw ApiException.conflict("Username '" + username + "' is already taken");
@@ -58,7 +48,7 @@ public class AccountService {
 
         LocalDateTime now = LocalDateTime.now(clock);
         AppUser user = new AppUser(username, email, request.fullName().trim(),
-                passwordEncoder.encode(request.password()), now);                 // only the BCrypt hash is stored
+                passwordEncoder.encode(request.password()), now);
         user.getRoles().add(roles.findByName(DEFAULT_ROLE).orElseThrow());
         try {
             users.saveAndFlush(user);

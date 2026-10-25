@@ -4,9 +4,7 @@ import java.math.BigDecimal;
 
 import com.company.methodsec.model.Employee;
 
-/** What the API returns. Salary appears ONLY in SalaryResponse, which has its own rule. */
 public final class EmployeeResponses {
-
     private EmployeeResponses() {
     }
 
