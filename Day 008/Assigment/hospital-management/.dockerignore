@@ -1,0 +1,8 @@
+# Not needed inside the image (keeps the build context small)
+target/
+postman/
+docs/
+.git/
+*.md
+# Never copy the local MySQL password into an image
+src/main/resources/db-secret.properties

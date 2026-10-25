@@ -1,0 +1,40 @@
+# Extension: run MySQL and the application together.
+#   docker compose up --build        start both (the API is on http://localhost:8080)
+#   docker compose down -v           stop and delete the database volume
+#
+# MySQL is published on port 3307 so it does not clash with a MySQL already
+# installed on the computer (port 3306).
+
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-hospital}
+      MYSQL_DATABASE: hospital_day09
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      # The app waits until MySQL really accepts connections, not just until the container started
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${MYSQL_ROOT_PASSWORD:-hospital}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  app:
+    build: .
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      # Environment variables override application.properties.
+      # Inside the Compose network, MySQL is reached by its service name.
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/hospital_day09
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD:-hospital}
+    ports:
+      - "8080:8080"
+
+volumes:
+  mysql-data:
