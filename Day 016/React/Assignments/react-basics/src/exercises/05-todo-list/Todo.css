@@ -1,0 +1,106 @@
+.todo {
+  max-width: 640px;
+}
+
+.todo__form {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.todo__input {
+  flex: 1;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font: inherit;
+}
+
+.todo__button {
+  padding: 0.45rem 0.8rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-surface);
+  font: inherit;
+  cursor: pointer;
+}
+
+.todo__button--primary {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+}
+
+.todo__button--danger {
+  color: var(--color-danger);
+}
+
+.todo__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1rem 0 0.75rem;
+}
+
+.todo__pending {
+  margin: 0;
+  color: var(--color-muted);
+}
+
+.todo__filters {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.todo__filter {
+  padding: 0.3rem 0.7rem;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface);
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.todo__filter--active {
+  background: var(--color-text);
+  border-color: var(--color-text);
+  color: #fff;
+}
+
+.todo__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.todo__item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.8rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}
+
+.todo__text {
+  flex: 1;
+}
+
+.todo__item--done .todo__text {
+  text-decoration: line-through;
+  color: var(--color-muted);
+}
+
+.todo__empty {
+  padding: 1.25rem;
+  text-align: center;
+  color: var(--color-muted);
+  background: var(--color-surface);
+  border: 1px dashed var(--color-border);
+  border-radius: 8px;
+}

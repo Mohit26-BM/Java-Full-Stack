@@ -1,0 +1,35 @@
+.employee-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.employee-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-top: 4px solid var(--color-accent);
+  border-radius: 8px;
+  padding: 1rem 1.1rem;
+}
+
+.employee-card__name {
+  margin: 0 0 0.4rem;
+  font-size: 1.15rem;
+}
+
+.employee-card__id,
+.employee-card__location {
+  margin: 0.2rem 0;
+  color: var(--color-muted);
+  font-size: 0.9rem;
+}
+
+.employee-card__role {
+  margin: 0.2rem 0;
+  font-weight: 600;
+}
+
+.employee-card__summary {
+  margin: 0.7rem 0 0;
+  line-height: 1.45;
+}
