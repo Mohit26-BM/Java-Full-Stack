@@ -1,0 +1,121 @@
+{
+  "info": {
+    "name": "Exercise 3 - Secure REST API",
+    "description": "Run folder 1 first: the login requests save the tokens into collection variables (userToken, hrToken, adminToken, hrRefreshToken). Then run the other folders in order on fresh data.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "userToken", "value": "" },
+    { "key": "hrToken", "value": "" },
+    { "key": "adminToken", "value": "" },
+    { "key": "hrRefreshToken", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "1. Login (saves tokens)",
+      "item": [
+        {
+          "name": "Login as user",
+          "event": [{ "listen": "test", "script": { "exec": ["pm.collectionVariables.set('userToken', pm.response.json().accessToken);"] } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/auth/login",
+            "body": { "mode": "raw", "raw": "{\"username\":\"user\",\"password\":\"user123\"}" }
+          }
+        },
+        {
+          "name": "Login as hr",
+          "event": [{ "listen": "test", "script": { "exec": ["pm.collectionVariables.set('hrToken', pm.response.json().accessToken);", "pm.collectionVariables.set('hrRefreshToken', pm.response.json().refreshToken);"] } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/auth/login",
+            "body": { "mode": "raw", "raw": "{\"username\":\"hr\",\"password\":\"hr123\"}" }
+          }
+        },
+        {
+          "name": "Login as admin",
+          "event": [{ "listen": "test", "script": { "exec": ["pm.collectionVariables.set('adminToken', pm.response.json().accessToken);"] } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/auth/login",
+            "body": { "mode": "raw", "raw": "{\"username\":\"admin\",\"password\":\"admin123\"}" }
+          }
+        },
+        {
+          "name": "Wrong password (401)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/auth/login",
+            "body": { "mode": "raw", "raw": "{\"username\":\"hr\",\"password\":\"wrong\"}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Allowed requests",
+      "item": [
+        { "name": "USER lists employees (200)", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{userToken}}" }], "url": "{{baseUrl}}/api/employees" } },
+        { "name": "USER reads employee 1 (200)", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{userToken}}" }], "url": "{{baseUrl}}/api/employees/1" } },
+        { "name": "HR reads payroll (200)", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{hrToken}}" }], "url": "{{baseUrl}}/api/employees/1/payroll" } },
+        {
+          "name": "HR creates employee (201)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{hrToken}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/employees",
+            "body": { "mode": "raw", "raw": "{\"name\":\"Kiran Das\",\"email\":\"kiran.das@company.com\",\"department\":\"Engineering\",\"designation\":\"Engineer\",\"salary\":1100000.00,\"status\":\"ACTIVE\"}" }
+          }
+        },
+        {
+          "name": "HR updates employee 2 (200)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Authorization", "value": "Bearer {{hrToken}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/employees/2",
+            "body": { "mode": "raw", "raw": "{\"name\":\"Ravi Kumar\",\"email\":\"ravi.kumar@company.com\",\"department\":\"Finance\",\"designation\":\"Senior Accountant\",\"salary\":900000.00,\"status\":\"ACTIVE\"}" }
+          }
+        },
+        { "name": "ADMIN deletes employee 4 (204)", "request": { "method": "DELETE", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }], "url": "{{baseUrl}}/api/employees/4" } }
+      ]
+    },
+    {
+      "name": "3. Rejected requests",
+      "item": [
+        { "name": "No token (401)", "request": { "method": "GET", "url": "{{baseUrl}}/api/employees" } },
+        { "name": "USER reads payroll (403)", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{userToken}}" }], "url": "{{baseUrl}}/api/employees/1/payroll" } },
+        {
+          "name": "USER creates employee (403)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{userToken}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/employees",
+            "body": { "mode": "raw", "raw": "{\"name\":\"X\",\"email\":\"x@company.com\",\"department\":\"QA\",\"designation\":\"Tester\",\"salary\":1,\"status\":\"ACTIVE\"}" }
+          }
+        },
+        { "name": "HR deletes employee (403)", "request": { "method": "DELETE", "header": [{ "key": "Authorization", "value": "Bearer {{hrToken}}" }], "url": "{{baseUrl}}/api/employees/1" } },
+        { "name": "Malformed token (401)", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer abc.def.ghi" }], "url": "{{baseUrl}}/api/employees" } },
+        { "name": "Refresh token used as access token (401)", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{hrRefreshToken}}" }], "url": "{{baseUrl}}/api/employees" } }
+      ]
+    },
+    {
+      "name": "4. Refresh",
+      "item": [
+        {
+          "name": "Get a new access token",
+          "event": [{ "listen": "test", "script": { "exec": ["pm.collectionVariables.set('hrToken', pm.response.json().accessToken);"] } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/auth/refresh",
+            "body": { "mode": "raw", "raw": "{\"refreshToken\":\"{{hrRefreshToken}}\"}" }
+          }
+        }
+      ]
+    }
+  ]
+}

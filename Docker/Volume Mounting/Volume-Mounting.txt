@@ -1,0 +1,36 @@
+docker volume create csbvolume
+
+docker run --name my-mysql -e MYSQL_ROOT_PASSWORD=root -v csbvolume:/var/lib/mysql -d mysql:latest
+
+docker exec -it my-mysql bash
+
+mysql -u root -p
+
+CREATE DATABASE college;
+
+USE college;
+
+CREATE TABLE students (
+    id INT PRIMARY KEY,
+    name VARCHAR(50),
+    course VARCHAR(50)
+);
+
+exit;
+
+exit
+
+docker stop my-mysql
+
+docker rm my-MySQL 
+
+docker run --name my-mysql2 -e MYSQL_ROOT_PASSWORD=root -v csbvolume:/var/lib/mysql -d mysql:latest
+
+docker exec -it my-mysql2 mysql -u root -p
+
+USE college;
+
+SELECT * FROM students;
+
+
+

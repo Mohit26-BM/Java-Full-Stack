@@ -1,0 +1,60 @@
+{
+  "info": {
+    "name": "Exercise 1 - Employee REST API",
+    "description": "Run in order after a fresh start of the application (3 sample employees, the new one gets id 4).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [{ "key": "baseUrl", "value": "http://localhost:8080" }],
+  "item": [
+    { "name": "GET all employees (200)", "request": { "method": "GET", "url": "{{baseUrl}}/api/employees" } },
+    { "name": "GET one employee (200)", "request": { "method": "GET", "url": "{{baseUrl}}/api/employees/2" } },
+    {
+      "name": "POST create employee (201)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/api/employees",
+        "body": { "mode": "raw", "raw": "{\"name\":\"Kiran Das\",\"email\":\"Kiran.Das@company.com\",\"department\":\"Engineering\",\"salary\":82000.00,\"status\":\"ACTIVE\"}" }
+      }
+    },
+    {
+      "name": "PUT replace employee (200)",
+      "request": {
+        "method": "PUT",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/api/employees/4",
+        "body": { "mode": "raw", "raw": "{\"name\":\"Kiran Das\",\"email\":\"kiran.das@company.com\",\"department\":\"Platform\",\"salary\":88000.00,\"status\":\"ACTIVE\"}" }
+      }
+    },
+    {
+      "name": "PATCH status (200)",
+      "request": {
+        "method": "PATCH",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/api/employees/4/status",
+        "body": { "mode": "raw", "raw": "{\"status\":\"ON_LEAVE\"}" }
+      }
+    },
+    { "name": "DELETE employee (204)", "request": { "method": "DELETE", "url": "{{baseUrl}}/api/employees/4" } },
+    { "name": "GET deleted employee (404)", "request": { "method": "GET", "url": "{{baseUrl}}/api/employees/4" } },
+    {
+      "name": "POST invalid body (400)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/api/employees",
+        "body": { "mode": "raw", "raw": "{\"name\":\"\",\"email\":\"not-an-email\",\"department\":\"HR\",\"salary\":-5}" }
+      }
+    },
+    {
+      "name": "PATCH unknown status value (400)",
+      "request": {
+        "method": "PATCH",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/api/employees/1/status",
+        "body": { "mode": "raw", "raw": "{\"status\":\"RETIRED\"}" }
+      }
+    },
+    { "name": "DELETE unknown id (404)", "request": { "method": "DELETE", "url": "{{baseUrl}}/api/employees/99" } }
+  ]
+}

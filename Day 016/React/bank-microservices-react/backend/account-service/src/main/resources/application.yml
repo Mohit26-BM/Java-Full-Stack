@@ -1,0 +1,21 @@
+server:
+  port: 8082
+spring:
+  application:
+    name: ACCOUNTS          # the gateway route uses lb://ACCOUNTS
+  datasource:
+    url: jdbc:h2:mem:accountdb;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    registry-fetch-interval-seconds: 5   # pick up the CUSTOMER service quickly (default 30)
+  instance:
+    prefer-ip-address: true

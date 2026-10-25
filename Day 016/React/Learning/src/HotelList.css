@@ -1,0 +1,47 @@
+/* Coolors palette: https://coolors.co/987284-75b9be-d0d6b5-f9b5ac-ee7674 */
+.hotel-page {
+  --dusty-mauve: #987284;
+  --tropical-teal: #75b9be;
+  --beige: #d0d6b5;
+  --powder-blush: #f9b5ac;
+  --light-coral: #ee7674;
+  --hotel-text: #4a3340; /* dark mauve for readable text */
+}
+
+.hotel-page h1 {
+  color: var(--dusty-mauve);
+}
+
+.hotel-page .hotel-btn {
+  background-color: var(--dusty-mauve);
+  border-color: var(--dusty-mauve);
+  color: #fff;
+}
+
+.hotel-page .hotel-btn:hover:not(:disabled) {
+  background-color: var(--light-coral);
+  border-color: var(--light-coral);
+}
+
+.hotel-table th,
+.hotel-table td {
+  border-color: var(--tropical-teal);
+}
+
+.hotel-table thead th {
+  background-color: var(--dusty-mauve);
+  color: #fff;
+}
+
+.hotel-table tbody td {
+  background-color: color-mix(in srgb, var(--beige) 45%, white);
+  color: var(--hotel-text);
+}
+
+.hotel-table tbody tr:nth-of-type(even) td {
+  background-color: color-mix(in srgb, var(--powder-blush) 45%, white);
+}
+
+.hotel-table tbody tr:hover td {
+  background-color: color-mix(in srgb, var(--tropical-teal) 40%, white);
+}

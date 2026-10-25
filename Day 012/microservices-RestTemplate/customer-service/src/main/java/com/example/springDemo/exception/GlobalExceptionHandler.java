@@ -40,6 +40,11 @@ public class GlobalExceptionHandler {
         return error(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<Map<String, String>> handleInvalidCredentials(InvalidCredentialsException ex) {
+        return error(HttpStatus.UNAUTHORIZED, ex.getMessage());
+    }
+
     @ExceptionHandler(DuplicateEmailException.class)
     public ResponseEntity<Map<String, String>> handleDuplicateEmail(DuplicateEmailException ex) {
         return error(HttpStatus.CONFLICT, ex.getMessage());

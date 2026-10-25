@@ -1,0 +1,264 @@
+{
+  "info": {
+    "name": "Hospital Management API",
+    "description": "Run the requests IN ORDER on a fresh database (schema.sql + sample-data.sql). The ids in the URLs match that order.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" }
+  ],
+  "item": [
+    {
+      "name": "1. End-to-end flow",
+      "item": [
+        {
+          "name": "Create department",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/departments",
+            "body": { "mode": "raw", "raw": "{\"name\":\"Neurology\",\"location\":\"Block D, Floor 2\"}" }
+          }
+        },
+        {
+          "name": "List active departments",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/departments?activeOnly=true" }
+        },
+        {
+          "name": "Register doctor",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/doctors",
+            "body": { "mode": "raw", "raw": "{\"doctorCode\":\"D004\",\"name\":\"Dr. Kavya Nair\",\"specialization\":\"Neurology\",\"email\":\"kavya.nair@hospital.com\",\"phone\":\"9876500004\",\"consultationFee\":900.00,\"departmentId\":5}" }
+          }
+        },
+        {
+          "name": "Find doctor",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/doctors/4" }
+        },
+        {
+          "name": "Search doctors by specialization",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/doctors?specialization=Cardiology" }
+        },
+        {
+          "name": "Register patient",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/patients",
+            "body": { "mode": "raw", "raw": "{\"patientNumber\":\"P1004\",\"name\":\"Rajiv Menon\",\"dateOfBirth\":\"1988-02-14\",\"gender\":\"MALE\",\"email\":\"rajiv.menon@example.com\",\"phone\":\"9000000004\",\"address\":\"Kochi\"}" }
+          }
+        },
+        {
+          "name": "Search patients by name",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/patients/search?name=Raj" }
+        },
+        {
+          "name": "Book appointment",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/appointments",
+            "body": { "mode": "raw", "raw": "{\"patientId\":4,\"doctorId\":4,\"appointmentDate\":\"2026-10-20\",\"startTime\":\"10:00\",\"endTime\":\"10:30\",\"reason\":\"Recurring headaches\"}" }
+          }
+        },
+        {
+          "name": "Paginated appointments",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/appointments?page=0&size=10&sort=appointmentDate,desc" }
+        },
+        {
+          "name": "Confirm appointment (version 0)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/appointments/3/status",
+            "body": { "mode": "raw", "raw": "{\"status\":\"CONFIRMED\",\"version\":0}" }
+          }
+        },
+        {
+          "name": "Complete appointment + medical record (version 1)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/appointments/3/complete",
+            "body": { "mode": "raw", "raw": "{\"version\":1,\"diagnosis\":\"Tension-type headache\",\"prescription\":\"Paracetamol 500mg as needed\",\"doctorNotes\":\"Reduce screen time\",\"followUpDate\":\"2026-11-03\"}" }
+          }
+        },
+        {
+          "name": "Patient medical history",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/patients/4/history" }
+        },
+        {
+          "name": "Doctor schedule",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/doctors/4/appointments?date=2026-10-20" }
+        }
+      ]
+    },
+    {
+      "name": "2. Overlap rule",
+      "item": [
+        {
+          "name": "Book 10:00-10:30 (201)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/appointments",
+            "body": { "mode": "raw", "raw": "{\"patientId\":3,\"doctorId\":4,\"appointmentDate\":\"2026-10-21\",\"startTime\":\"10:00\",\"endTime\":\"10:30\"}" }
+          }
+        },
+        {
+          "name": "Book 10:15-10:45 (409 overlap)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/appointments",
+            "body": { "mode": "raw", "raw": "{\"patientId\":1,\"doctorId\":4,\"appointmentDate\":\"2026-10-21\",\"startTime\":\"10:15\",\"endTime\":\"10:45\"}" }
+          }
+        },
+        {
+          "name": "Book 10:30-11:00 (201 boundary)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/appointments",
+            "body": { "mode": "raw", "raw": "{\"patientId\":1,\"doctorId\":4,\"appointmentDate\":\"2026-10-21\",\"startTime\":\"10:30\",\"endTime\":\"11:00\"}" }
+          }
+        },
+        {
+          "name": "Available doctors",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/doctors/available?specialization=Neurology&date=2026-10-21&startTime=11:00&endTime=11:30" }
+        }
+      ]
+    },
+    {
+      "name": "3. Validation and business rules",
+      "item": [
+        {
+          "name": "Past date (400)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/appointments",
+            "body": { "mode": "raw", "raw": "{\"patientId\":1,\"doctorId\":1,\"appointmentDate\":\"2026-10-01\",\"startTime\":\"10:00\",\"endTime\":\"10:30\"}" }
+          }
+        },
+        {
+          "name": "End before start (400)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/appointments",
+            "body": { "mode": "raw", "raw": "{\"patientId\":1,\"doctorId\":1,\"appointmentDate\":\"2026-10-22\",\"startTime\":\"11:00\",\"endTime\":\"10:30\"}" }
+          }
+        },
+        {
+          "name": "Duplicate patient number (409)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/patients",
+            "body": { "mode": "raw", "raw": "{\"patientNumber\":\"P1001\",\"name\":\"Someone Else\",\"dateOfBirth\":\"1990-01-01\",\"gender\":\"FEMALE\",\"phone\":\"9000000099\"}" }
+          }
+        },
+        {
+          "name": "Cancel a COMPLETED appointment (422)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/appointments/3/status",
+            "body": { "mode": "raw", "raw": "{\"status\":\"CANCELLED\",\"version\":2}" }
+          }
+        },
+        {
+          "name": "Medical record twice (409)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/medical-records",
+            "body": { "mode": "raw", "raw": "{\"appointmentId\":3,\"diagnosis\":\"Second record\"}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Optimistic locking",
+      "item": [
+        {
+          "name": "Receptionist 1 confirms A10001 (version 0) -> 200",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/appointments/1/status",
+            "body": { "mode": "raw", "raw": "{\"status\":\"CONFIRMED\",\"version\":0}" }
+          }
+        },
+        {
+          "name": "Receptionist 2 cancels with stale version 0 -> 409",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/appointments/1/status",
+            "body": { "mode": "raw", "raw": "{\"status\":\"CANCELLED\",\"version\":0}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Transaction rollback",
+      "item": [
+        {
+          "name": "Confirm appointment 4",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/appointments/4/status",
+            "body": { "mode": "raw", "raw": "{\"status\":\"CONFIRMED\",\"version\":0}" }
+          }
+        },
+        {
+          "name": "Complete with invalid follow-up date -> 422 (rolled back)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/appointments/4/complete",
+            "body": { "mode": "raw", "raw": "{\"version\":1,\"diagnosis\":\"Migraine\",\"followUpDate\":\"2026-10-01\"}" }
+          }
+        },
+        {
+          "name": "Appointment 4 is still CONFIRMED",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/appointments/4" }
+        }
+      ]
+    },
+    {
+      "name": "6. Search and reports",
+      "item": [
+        {
+          "name": "Search by doctor, page 0 size 2",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/appointments?doctorId=4&page=0&size=2&sort=startTime,asc" }
+        },
+        {
+          "name": "Search by status and department",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/appointments?status=CONFIRMED&departmentId=1" }
+        },
+        {
+          "name": "Doctors by fee range",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/doctors?minFee=600&maxFee=1000" }
+        },
+        {
+          "name": "Doctor summaries (JPQL projection)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/doctors/summaries" }
+        },
+        {
+          "name": "Department workload",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/reports/department-workload?departmentId=5&fromDate=2026-10-01&toDate=2026-10-31" }
+        },
+        {
+          "name": "Revenue report",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/reports/revenue?fromDate=2026-10-01&toDate=2026-10-31" }
+        }
+      ]
+    }
+  ]
+}

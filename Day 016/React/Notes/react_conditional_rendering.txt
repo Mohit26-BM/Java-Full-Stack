@@ -1,0 +1,1321 @@
+REACT 19 + TYPESCRIPT: CONDITIONAL RENDERING
+Complete Examples from Beginner to Advanced
+============================================
+
+HOW TO USE THIS FILE
+--------------------
+These examples use React 19 with TypeScript and Vite. Each example is a
+self-contained component. To try one, paste the code into a .tsx file inside
+src/ and render that component from App.tsx.
+
+Example App.tsx:
+----------------
+import Example1 from "./Example1";
+
+function App() {
+  return <Example1 />;
+}
+
+export default App;
+
+You can name each component/file as you prefer. Examples that use useState
+must be rendered inside a React application. Import useState from "react".
+
+
+
+WHAT IS CONDITIONAL RENDERING?
+------------------------------
+Conditional rendering means displaying different JSX depending on a condition.
+For example, show "Welcome" when a user is logged in and "Please log in" when
+they are not.
+
+Important:
+- Use JavaScript expressions inside JSX braces: {condition && <p>...</p>}
+- Use a ternary for a choice between two outcomes: condition ? A : B
+- Use if/else or switch before the return when logic is more involved.
+- Use useState when the condition must change in response to user interaction.
+- Use a stable key when rendering arrays with map().
+- Avoid {count && <p>...</p>} when count might be 0, because React may render 0.
+  Prefer {count > 0 && <p>...</p>}.
+
+---------------------------------
+EXAMPLE 1: IF/ELSE BEFORE RETURN
+----------------------------------
+Scenario: Show a login message.
+
+function LoginMessage() {
+  const isLoggedIn: boolean = true;
+
+  if (isLoggedIn) {
+    return <h2>Welcome back!</h2>;
+  } else {
+    return <h2>Please log in.</h2>;
+  }
+}
+
+Explanation:
+- isLoggedIn is true, so the first return is used.
+- Change it to false to display "Please log in."
+- A return ends the function, so only one branch is rendered.
+
+------------------------------------------------------------
+EXAMPLE 2: TERNARY OPERATOR
+------------------------------------------------------------
+Scenario: Display pass or fail.
+
+function ExamResult() {
+  const marks: number = 72;
+
+  return (
+    <div>
+      <h2>Exam Result</h2>
+      {marks >= 40 ? <p>Pass</p> : <p>Fail</p>}
+    </div>
+  );
+}
+
+Explanation:
+condition ? resultWhenTrue : resultWhenFalse
+
+------------------------------------------------------------
+EXAMPLE 3: LOGICAL AND (&&)
+------------------------------------------------------------
+Scenario: Show a message only if a discount exists.
+
+function DiscountMessage() {
+  const discount: number = 15;
+
+  return (
+    <div>
+      <h2>Special Offer</h2>
+      {discount > 0 && <p>You save {discount}% today!</p>}
+    </div>
+  );
+}
+
+If discount is 0, the paragraph is not rendered.
+
+------------------------------------------------------------
+EXAMPLE 4: LOGICAL OR (||) FOR A FALLBACK VALUE
+------------------------------------------------------------
+Scenario: Display a default name when no name is provided.
+
+function Greeting() {
+  const name: string = "";
+
+  return <h2>Hello, {name || "Guest"}!</h2>;
+}
+
+Note: || returns the fallback when the left side is falsy. For numeric values
+where 0 is valid, consider ?? instead.
+
+------------------------------------------------------------
+EXAMPLE 5: NULLISH COALESCING (??)
+------------------------------------------------------------
+Scenario: Use a default quantity only when the value is null or undefined.
+
+function QuantityLabel() {
+  const quantity: number | null = 0;
+
+  return <p>Quantity: {quantity ?? 10}</p>;
+}
+
+Output: Quantity: 0
+
+Unlike ||, ?? does not replace a valid 0 or an empty string.
+
+------------------------------------------------------------
+EXAMPLE 6: EARLY RETURN FOR LOADING
+------------------------------------------------------------
+Scenario: Show loading content before the main content.
+
+function LoadingExample() {
+  const isLoading: boolean = true;
+
+  if (isLoading) {
+    return <p>Loading products...</p>;
+  }
+
+  return <h2>Products are ready.</h2>;
+}
+
+------------------------------------------------------------
+EXAMPLE 7: ERROR, LOADING, AND SUCCESS STATES
+------------------------------------------------------------
+Scenario: Choose among three UI states.
+
+function RequestStatus() {
+  const status: "loading" | "error" | "success" = "success";
+
+  if (status === "loading") {
+    return <p>Loading...</p>;
+  }
+
+  if (status === "error") {
+    return <p role="alert">Unable to load data.</p>;
+  }
+
+  return <p>Data loaded successfully.</p>;
+}
+
+------------------------------------------------------------
+EXAMPLE 8: SWITCH STATEMENT
+------------------------------------------------------------
+Scenario: Render a message based on order status.
+
+function OrderStatus() {
+  const status: string = "SHIPPED";
+  let message: string;
+
+  switch (status) {
+    case "PENDING":
+      message = "Your order is pending.";
+      break;
+    case "SHIPPED":
+      message = "Your order has shipped.";
+      break;
+    case "DELIVERED":
+      message = "Your order was delivered.";
+      break;
+    case "CANCELLED":
+      message = "Your order was cancelled.";
+      break;
+    default:
+      message = "Unknown order status.";
+  }
+
+  return <p>{message}</p>;
+}
+
+------------------------------------------------------------
+EXAMPLE 9: SHOW OR HIDE CONTENT WITH useState
+------------------------------------------------------------
+Scenario: Toggle product details.
+
+import { useState } from "react";
+
+function ProductDetailsToggle() {
+  const [showDetails, setShowDetails] = useState<boolean>(false);
+  const [count,setCount]  = useState<number>(0);
+
+  return (
+    <div>
+      <h2>Laptop</h2>
+      <button onClick={() => setShowDetails(!showDetails)}>
+        {showDetails ? "Hide details" : "Show details"}
+      </button>
+
+      {showDetails && (
+        <div>
+          <p>Category: Electronics</p>
+          <p>Quantity: 12</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+------------------------------------------------------------
+EXAMPLE 10: LOGIN / LOGOUT TOGGLE
+------------------------------------------------------------
+import { useState } from "react";
+
+function LoginToggle() {
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+
+  return (
+    <div>
+      {isLoggedIn ? <h2>Welcome, user!</h2> : <h2>You are logged out.</h2>}
+      <button onClick={() => setIsLoggedIn(!isLoggedIn)}>
+        {isLoggedIn ? "Logout" : "Login"}
+      </button>
+    </div>
+  );
+}
+
+This is a UI demonstration only; it does not implement real authentication.
+
+------------------------------------------------------------
+EXAMPLE 11: SHOW A WARNING WHEN STOCK IS LOW
+------------------------------------------------------------
+function StockWarning() {
+  const quantity: number = 3;
+
+  return (
+    <div>
+      <h2>Wireless Mouse</h2>
+      <p>Quantity: {quantity}</p>
+      {quantity < 5 && <p role="status">Low stock! Reorder soon.</p>}
+      {quantity === 0 && <p role="alert">Out of stock.</p>}
+    </div>
+  );
+}
+
+Note: If quantity is 0, both conditions are true. If you want only one message,
+use a ternary or if/else chain instead.
+
+------------------------------------------------------------
+EXAMPLE 12: PRODUCT STOCK STATUS WITH TERNARY
+------------------------------------------------------------
+function ProductStockStatus() {
+  const quantity: number = 0;
+
+  return (
+    <div>
+      <h2>Keyboard</h2>
+      {quantity > 0
+        ? <p>Available: {quantity}</p>
+        : <p>Out of stock</p>}
+    </div>
+  );
+}
+
+------------------------------------------------------------
+EXAMPLE 13: CONDITIONAL RENDERING WITH A PRODUCT ARRAY
+------------------------------------------------------------
+interface Product {
+  id: number;
+  name: string;
+  category: string;
+  quantity: number;
+}
+
+function ProductList() {
+  const products: Product[] = [
+    { id: 1, name: "Laptop", category: "Electronics", quantity: 10 },
+    { id: 2, name: "Phone", category: "Electronics", quantity: 0 },
+    { id: 3, name: "Desk", category: "Furniture", quantity: 4 }
+  ];
+
+  return (
+    <div>
+      <h2>Products</h2>
+      {products.length > 0 ? (
+        products.map((product) => (
+          <section key={product.id}>
+            <h3>{product.name}</h3>
+            <p>Category: {product.category}</p>
+            {product.quantity > 0
+              ? <p>Available: {product.quantity}</p>
+              : <p>Out of stock</p>}
+          </section>
+        ))
+      ) : (
+        <p>No products found.</p>
+      )}
+    </div>
+  );
+}
+
+------------------------------------------------------------
+EXAMPLE 14: EMPTY ARRAY MESSAGE
+------------------------------------------------------------
+function EmptyListExample() {
+  const names: string[] = [];
+
+  return (
+    <div>
+      {names.length === 0 ? (
+        <p>No names are available.</p>
+      ) : (
+        names.map((name) => <p key={name}>{name}</p>)
+      )}
+    </div>
+  );
+}
+
+------------------------------------------------------------
+EXAMPLE 15: FILTER ITEMS BEFORE RENDERING
+------------------------------------------------------------
+interface Item {
+  id: number;
+  name: string;
+  active: boolean;
+}
+
+function ActiveItems() {
+  const items: Item[] = [
+    { id: 1, name: "Item A", active: true },
+    { id: 2, name: "Item B", active: false },
+    { id: 3, name: "Item C", active: true }
+  ];
+
+  const activeItems = items.filter((item) => item.active);
+
+  return (
+    <div>
+      <h2>Active Items</h2>
+      {activeItems.length === 0 ? (
+        <p>No active items.</p>
+      ) : (
+        activeItems.map((item) => <p key={item.id}>{item.name}</p>)
+      )}
+    </div>
+  );
+}
+
+------------------------------------------------------------
+EXAMPLE 16: ROLE-BASED UI
+------------------------------------------------------------
+type Role = "admin" | "manager" | "user";
+
+function RoleDashboard() {
+  const role: Role = "manager";
+
+  return (
+    <div>
+      <h2>Dashboard</h2>
+      {role === "admin" && <button>Manage users</button>}
+      {role === "manager" && <button>View team reports</button>}
+      {role === "user" && <button>View my profile</button>}
+    </div>
+  );
+}
+
+Security note: Hiding a button is not authorization. Protect sensitive operations
+on the server as well.
+
+------------------------------------------------------------
+EXAMPLE 17: MULTIPLE CONDITIONS WITH TERNARY
+------------------------------------------------------------
+function AgeCategory() {
+  const age: number = 46;
+
+  return (
+    <p>
+      {age < 13
+        ? "Child"
+        : age < 20
+          ? "Teenager"
+          : age < 60
+            ? "Adult"
+            : "Senior"}
+    </p>
+  );
+}
+
+Nested ternaries can become hard to read. For complicated logic, use if/else.
+
+------------------------------------------------------------
+EXAMPLE 18: MULTIPLE CONDITIONS WITH if / else if
+------------------------------------------------------------
+function GradeCalculator() {
+  const marks: number = 86;
+  let grade: string;
+
+  if (marks >= 90) {
+    grade = "A+";
+  } else if (marks >= 80) {
+    grade = "A";
+  } else if (marks >= 70) {
+    grade = "B";
+  } else if (marks >= 40) {
+    grade = "C";
+  } else {
+    grade = "Fail";
+  }
+
+  return <h2>Grade: {grade}</h2>;
+}
+
+------------------------------------------------------------
+EXAMPLE 19: DISABLE A BUTTON CONDITIONALLY
+------------------------------------------------------------
+function SubmitButton() {
+  const formIsValid: boolean = false;
+
+  return (
+    <div>
+      <button disabled={!formIsValid}>Submit</button>
+      {!formIsValid && <p>Complete all required fields first.</p>}
+    </div>
+  );
+}
+
+The button is disabled when formIsValid is false.
+
+------------------------------------------------------------
+EXAMPLE 20: SHOW VALIDATION ERRORS
+------------------------------------------------------------
+import { useState } from "react";
+
+function NameValidation() {
+  const [name, setName] = useState<string>("");
+
+  const hasError = name.trim().length === 0;
+
+  return (
+    <div>
+      <label>
+        Name:
+        <input
+          value={name}
+          onChange={(event) => setName(event.target.value)}
+        />
+      </label>
+
+      {hasError && <p role="alert">Name is required.</p>}
+      {!hasError && <p>Looks good!</p>}
+    </div>
+  );
+}
+
+------------------------------------------------------------
+EXAMPLE 21: CONDITIONAL RENDERING BASED ON INPUT LENGTH
+------------------------------------------------------------
+import { useState } from "react";
+
+function PasswordLengthCheck() {
+  const [password, setPassword] = useState<string>("");
+
+  return (
+    <div>
+      <label>
+        Password:
+        <input
+          type="password"
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+        />
+      </label>
+
+      {password.length === 0 && <p>Enter a password.</p>}
+      {password.length > 0 && password.length < 8 && (
+        <p>Password must contain at least 8 characters.</p>
+      )}
+      {password.length >= 8 && <p>Password length looks good.</p>}
+    </div>
+  );
+}
+
+This is only a length check, not a complete password-strength or security check.
+
+------------------------------------------------------------
+EXAMPLE 22: SHOW A CHARACTER COUNTER
+------------------------------------------------------------
+import { useState } from "react";
+
+function CommentBox() {
+  const [comment, setComment] = useState<string>("");
+  const maxLength = 100;
+
+  return (
+    <div>
+      <textarea
+        value={comment}
+        maxLength={maxLength}
+        onChange={(event) => setComment(event.target.value)}
+      />
+      <p>{comment.length}/{maxLength} characters</p>
+      {comment.length >= maxLength && <p>Character limit reached.</p>}
+    </div>
+  );
+}
+
+------------------------------------------------------------
+EXAMPLE 23: CONDITIONAL CSS CLASS
+------------------------------------------------------------
+import { useState } from "react";
+
+function ActiveStatus() {
+  const [isActive, setIsActive] = useState<boolean>(true);
+
+  return (
+    <div>
+      <p className={isActive ? "active" : "inactive"}>
+        {isActive ? "Active" : "Inactive"}
+      </p>
+      <button onClick={() => setIsActive(!isActive)}>Toggle status</button>
+    </div>
+  );
+}
+
+Optional CSS:
+.active { color: green; }
+.inactive { color: gray; }
+
+------------------------------------------------------------
+EXAMPLE 24: CONDITIONAL INLINE STYLES
+------------------------------------------------------------
+function TemperatureStatus() {
+  const temperature: number = 38;
+
+  const style: React.CSSProperties = {
+    color: temperature >= 37.5 ? "red" : "green",
+    fontWeight: "bold"
+  };
+
+  return (
+    <p style={style}>
+      {temperature >= 37.5 ? "High temperature" : "Normal temperature"}
+    </p>
+  );
+}
+
+------------------------------------------------------------
+EXAMPLE 25: SHOW / HIDE A PASSWORD
+------------------------------------------------------------
+import { useState } from "react";
+
+function ShowPassword() {
+  const [visible, setVisible] = useState<boolean>(false);
+  const [password, setPassword] = useState<string>("demo-password");
+
+  return (
+    <div>
+      <input
+        type={visible ? "text" : "password"}
+        value={password}
+        onChange={(event) => setPassword(event.target.value)}
+      />
+      <button type="button" onClick={() => setVisible(!visible)}>
+        {visible ? "Hide password" : "Show password"}
+      </button>
+    </div>
+  );
+}
+
+------------------------------------------------------------
+EXAMPLE 26: CONDITIONAL MODAL
+------------------------------------------------------------
+import { useState } from "react";
+
+function ConfirmationModal() {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+
+  return (
+    <div>
+      <button onClick={() => setIsOpen(true)}>Delete product</button>
+
+      {isOpen && (
+        <div role="dialog" aria-modal="true" aria-labelledby="dialog-title">
+          <h2 id="dialog-title">Confirm deletion</h2>
+          <p>Are you sure you want to delete this product?</p>
+          <button onClick={() => setIsOpen(false)}>Cancel</button>
+          <button onClick={() => setIsOpen(false)}>Confirm</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+This is a basic inline dialog demonstration. A production modal should also
+handle focus, keyboard interaction, and actual deletion logic.
+
+------------------------------------------------------------
+EXAMPLE 27: CONDITIONAL TABS
+------------------------------------------------------------
+import { useState } from "react";
+
+function TabsExample() {
+  const [activeTab, setActiveTab] = useState<"details" | "reviews">("details");
+
+  return (
+    <div>
+      <button onClick={() => setActiveTab("details")}>Details</button>
+      <button onClick={() => setActiveTab("reviews")}>Reviews</button>
+
+      {activeTab === "details" && <p>Product specifications go here.</p>}
+      {activeTab === "reviews" && <p>Customer reviews go here.</p>}
+    </div>
+  );
+}
+
+------------------------------------------------------------
+EXAMPLE 28: CONDITIONAL CONTENT BASED ON CHECKBOX
+------------------------------------------------------------
+import { useState } from "react";
+
+function TermsCheckbox() {
+  const [accepted, setAccepted] = useState<boolean>(false);
+
+  return (
+    <div>
+      <label>
+        <input
+          type="checkbox"
+          checked={accepted}
+          onChange={(event) => setAccepted(event.target.checked)}
+        />
+        I accept the terms and conditions.
+      </label>
+
+      {accepted && <p>Thank you for accepting the terms.</p>}
+      <button disabled={!accepted}>Continue</button>
+    </div>
+  );
+}
+
+------------------------------------------------------------
+EXAMPLE 29: CONDITIONAL RENDERING FROM PROPS
+------------------------------------------------------------
+interface GreetingProps {
+  name?: string;
+  isPremium: boolean;
+}
+
+function MemberGreeting({ name, isPremium }: GreetingProps) {
+  return (
+    <div>
+      <h2>Hello, {name ?? "Guest"}!</h2>
+      {isPremium ? <p>Premium member benefits enabled.</p> : <p>Standard member.</p>}
+    </div>
+  );
+}
+
+Example usage:
+<MemberGreeting name="Praveen" isPremium={true} />
+
+------------------------------------------------------------
+EXAMPLE 30: RENDER A CHILD COMPONENT CONDITIONALLY
+------------------------------------------------------------
+function AdminPanel() {
+  return <section><h3>Admin tools</h3><p>User management</p></section>;
+}
+
+function UserPanel() {
+  const isAdmin: boolean = true;
+
+  return (
+    <div>
+      <h2>Account</h2>
+      {isAdmin ? <AdminPanel /> : <p>Standard user access</p>}
+    </div>
+  );
+}
+
+------------------------------------------------------------
+EXAMPLE 31: OPTIONAL COMPONENT RETURNING null
+------------------------------------------------------------
+interface AlertProps {
+  message: string;
+  visible: boolean;
+}
+
+function Alert({ message, visible }: AlertProps) {
+  if (!visible) {
+    return null;
+  }
+
+  return <div role="alert">{message}</div>;
+}
+
+Example usage:
+<Alert message="Saved successfully" visible={true} />
+
+Returning null means the component renders no UI.
+
+------------------------------------------------------------
+EXAMPLE 32: CONDITIONAL ICON / LABEL BASED ON STATUS
+------------------------------------------------------------
+type TaskStatus = "todo" | "in-progress" | "done";
+
+function TaskLabel() {
+  const status: TaskStatus = "in-progress";
+
+  return (
+    <span>
+      {status === "todo" && "○ To do"}
+      {status === "in-progress" && "◐ In progress"}
+      {status === "done" && "✓ Done"}
+    </span>
+  );
+}
+
+------------------------------------------------------------
+EXAMPLE 33: CONDITIONAL RENDERING WITH OPTIONAL DATA
+------------------------------------------------------------
+interface Customer {
+  id: number;
+  name: string;
+  city?: string;
+}
+
+function CustomerCard() {
+  const customer: Customer = {
+    id: 1,
+    name: "Ananya"
+  };
+
+  return (
+    <div>
+      <h2>{customer.name}</h2>
+      {customer.city
+        ? <p>City: {customer.city}</p>
+        : <p>City not provided.</p>}
+    </div>
+  );
+}
+
+------------------------------------------------------------
+EXAMPLE 34: SAFE RENDERING WHEN DATA MAY BE null
+------------------------------------------------------------
+interface User {
+  id: number;
+  name: string;
+}
+
+function UserCard() {
+  const user: User | null = null;
+
+  if (user === null) {
+    return <p>User not found.</p>;
+  }
+
+  return <h2>{user.name}</h2>;
+}
+
+TypeScript narrows the type after the null check, so user.name is safe below it.
+
+------------------------------------------------------------
+EXAMPLE 35: CONDITIONAL RENDERING FOR API STATES
+------------------------------------------------------------
+type ApiState =
+  | { status: "loading" }
+  | { status: "error"; message: string }
+  | { status: "success"; products: string[] };
+
+function ApiStateExample() {
+  const state: ApiState = {
+    status: "success",
+    products: ["Laptop", "Mobile", "Tablet"]
+  };
+
+  if (state.status === "loading") {
+    return <p>Loading products...</p>;
+  }
+
+  if (state.status === "error") {
+    return <p role="alert">Error: {state.message}</p>;
+  }
+
+  return (
+    <div>
+      <h2>Products</h2>
+      {state.products.length === 0
+        ? <p>No products available.</p>
+        : state.products.map((product) => <p key={product}>{product}</p>)}
+    </div>
+  );
+}
+
+This discriminated union lets TypeScript understand which fields exist in each
+state. The state is hard-coded here for demonstration.
+
+------------------------------------------------------------
+EXAMPLE 36: CONDITIONAL PAGINATION MESSAGE
+------------------------------------------------------------
+function PaginationMessage() {
+  const currentPage = 1;
+  const totalPages = 1;
+
+  return (
+    <div>
+      <p>Page {currentPage} of {totalPages}</p>
+      {currentPage > 1 && <button>Previous</button>}
+      {currentPage < totalPages && <button>Next</button>}
+      {totalPages === 1 && <p>Only one page is available.</p>}
+    </div>
+  );
+}
+
+------------------------------------------------------------
+EXAMPLE 37: CONDITIONAL SEARCH RESULTS
+------------------------------------------------------------
+import { useState } from "react";
+
+function SearchProducts() {
+  const [query, setQuery] = useState<string>("");
+
+  const products = ["Laptop", "Mobile", "Keyboard", "Monitor"];
+  const results = products.filter((product) =>
+    product.toLowerCase().includes(query.toLowerCase())
+  );
+
+  return (
+    <div>
+      <input
+        placeholder="Search products"
+        value={query}
+        onChange={(event) => setQuery(event.target.value)}
+      />
+
+      {query.trim() === "" ? (
+        <p>Enter a search term.</p>
+      ) : results.length > 0 ? (
+        results.map((product) => <p key={product}>{product}</p>)
+      ) : (
+        <p>No matching products found.</p>
+      )}
+    </div>
+  );
+}
+
+------------------------------------------------------------
+EXAMPLE 38: CONDITIONAL RENDERING WITH RADIO BUTTONS
+------------------------------------------------------------
+import { useState } from "react";
+
+function PaymentMethod() {
+  const [method, setMethod] = useState<"card" | "upi">("card");
+
+  return (
+    <div>
+      <label>
+        <input
+          type="radio"
+          name="payment"
+          checked={method === "card"}
+          onChange={() => setMethod("card")}
+        />
+        Card
+      </label>
+
+      <label>
+        <input
+          type="radio"
+          name="payment"
+          checked={method === "upi"}
+          onChange={() => setMethod("upi")}
+        />
+        UPI
+      </label>
+
+      {method === "card" && <p>Enter your card details.</p>}
+      {method === "upi" && <p>Enter your UPI ID.</p>}
+    </div>
+  );
+}
+
+------------------------------------------------------------
+EXAMPLE 39: CONDITIONAL RENDERING BASED ON TIME
+------------------------------------------------------------
+function TimeGreeting() {
+  const hour = new Date().getHours();
+
+  let greeting: string;
+
+  if (hour < 12) {
+    greeting = "Good morning";
+  } else if (hour < 17) {
+    greeting = "Good afternoon";
+  } else {
+    greeting = "Good evening";
+  }
+
+  return <h2>{greeting}!</h2>;
+}
+
+The time is read when the component renders. It will not update automatically
+at a later time unless something causes another render.
+
+------------------------------------------------------------
+EXAMPLE 40: CONDITIONAL RENDERING BASED ON A NUMBER
+------------------------------------------------------------
+function NumberSign() {
+  const number = -5;
+
+  return (
+    <p>
+      {number > 0
+        ? "Positive"
+        : number < 0
+          ? "Negative"
+          : "Zero"}
+    </p>
+  );
+}
+
+------------------------------------------------------------
+EXAMPLE 41: CONDITIONAL RENDERING WITH A FRAGMENT
+------------------------------------------------------------
+function ProfileSummary() {
+  const showContact = true;
+
+  return (
+    <>
+      <h2>Profile</h2>
+      <p>Name: Rohan</p>
+      {showContact && (
+        <>
+          <p>Email: rohan@example.com</p>
+          <p>Phone: 9000000000</p>
+        </>
+      )}
+    </>
+  );
+}
+
+Fragments group elements without adding an extra DOM element.
+
+------------------------------------------------------------
+EXAMPLE 42: CONDITIONAL RENDERING OF A PRICE
+------------------------------------------------------------
+function ProductPrice() {
+  const price = 1200;
+  const discountPrice: number | null = 999;
+
+  return (
+    <div>
+      {discountPrice !== null ? (
+        <>
+          <p>Original price: ₹{price}</p>
+          <p>Discount price: ₹{discountPrice}</p>
+        </>
+      ) : (
+        <p>Price: ₹{price}</p>
+      )}
+    </div>
+  );
+}
+
+------------------------------------------------------------
+EXAMPLE 43: CONDITIONAL RENDERING OF A NOTIFICATION
+------------------------------------------------------------
+import { useState } from "react";
+
+function NotificationExample() {
+  const [showNotification, setShowNotification] = useState<boolean>(true);
+
+  return (
+    <div>
+      <button onClick={() => setShowNotification(!showNotification)}>
+        Toggle notification
+      </button>
+
+      {showNotification && (
+        <aside role="status">
+          Your profile has been updated.
+        </aside>
+      )}
+    </div>
+  );
+}
+
+------------------------------------------------------------
+EXAMPLE 44: CONDITIONAL RENDERING WITH A SELECT BOX
+------------------------------------------------------------
+import { useState } from "react";
+
+function CountrySelector() {
+  const [country, setCountry] = useState<string>("India");
+
+  return (
+    <div>
+      <select value={country} onChange={(event) => setCountry(event.target.value)}>
+        <option value="India">India</option>
+        <option value="USA">USA</option>
+        <option value="Japan">Japan</option>
+      </select>
+
+      {country === "India" && <p>Namaste!</p>}
+      {country === "USA" && <p>Hello!</p>}
+      {country === "Japan" && <p>Konnichiwa!</p>}
+    </div>
+  );
+}
+
+------------------------------------------------------------
+EXAMPLE 45: CONDITIONAL RENDERING OF AN ADMIN ACTION
+------------------------------------------------------------
+interface EmployeeProps {
+  employeeName: string;
+  canDelete: boolean;
+}
+
+function EmployeeRow({ employeeName, canDelete }: EmployeeProps) {
+  return (
+    <div>
+      <span>{employeeName}</span>
+      {canDelete && <button type="button">Delete</button>}
+    </div>
+  );
+}
+
+Example usage:
+<EmployeeRow employeeName="Kiran" canDelete={false} />
+
+Again, the server must enforce permission checks; hiding a button is not security.
+
+------------------------------------------------------------
+EXAMPLE 46: CONDITIONAL RENDERING WITH A HELPER FUNCTION
+------------------------------------------------------------
+function PaymentStatus() {
+  const status = "paid";
+
+  function renderStatus() {
+    if (status === "paid") return <strong>Payment complete</strong>;
+    if (status === "pending") return <span>Payment pending</span>;
+    if (status === "failed") return <span>Payment failed</span>;
+    return <span>Unknown payment status</span>;
+  }
+
+  return <div>{renderStatus()}</div>;
+}
+
+A helper function can make the main JSX easier to read when the logic is reused
+or becomes lengthy. Keep it simple and avoid unnecessary abstraction.
+
+------------------------------------------------------------
+EXAMPLE 47: CONDITIONAL RENDERING WITH A BOOLEAN PROP
+------------------------------------------------------------
+interface BannerProps {
+  visible: boolean;
+  message: string;
+}
+
+function Banner({ visible, message }: BannerProps) {
+  if (!visible) return null;
+
+  return <div role="status">{message}</div>;
+}
+
+function BannerDemo() {
+  return (
+    <div>
+      <Banner visible={true} message="Welcome to the application." />
+      <Banner visible={false} message="This banner is hidden." />
+    </div>
+  );
+}
+
+------------------------------------------------------------
+EXAMPLE 48: CONDITIONAL RENDERING FOR A CART
+------------------------------------------------------------
+interface CartItem {
+  id: number;
+  name: string;
+  quantity: number;
+}
+
+function ShoppingCart() {
+  const items: CartItem[] = [
+    { id: 1, name: "Book", quantity: 2 },
+    { id: 2, name: "Pen", quantity: 5 }
+  ];
+
+  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+
+  return (
+    <div>
+      <h2>Shopping Cart</h2>
+      {totalItems === 0 ? (
+        <p>Your cart is empty.</p>
+      ) : (
+        <>
+          <p>You have {totalItems} items in your cart.</p>
+          {items.map((item) => (
+            <p key={item.id}>{item.name}: {item.quantity}</p>
+          ))}
+        </>
+      )}
+    </div>
+  );
+}
+
+------------------------------------------------------------
+EXAMPLE 49: CONDITIONAL RENDERING BASED ON A FEATURE FLAG
+------------------------------------------------------------
+function ReportsPage() {
+  const reportsEnabled = false;
+
+  return (
+    <div>
+      <h2>Application</h2>
+      {reportsEnabled ? (
+        <section>
+          <h3>Reports</h3>
+          <p>Monthly report is available.</p>
+        </section>
+      ) : (
+        <p>Reports are currently unavailable.</p>
+      )}
+    </div>
+  );
+}
+
+A real feature flag may come from configuration or a feature-management service.
+
+------------------------------------------------------------
+EXAMPLE 50: COMPLETE PRODUCT DISPLAY WITH MULTIPLE CONDITIONS
+------------------------------------------------------------
+interface Product {
+  id: number;
+  name: string;
+  category: string;
+  quantity: number;
+  price: number;
+  active: boolean;
+}
+
+function ProductInventory() {
+  const products: Product[] = [
+    {
+      id: 101,
+      name: "Laptop",
+      category: "Electronics",
+      quantity: 10,
+      price: 55000,
+      active: true
+    },
+    {
+      id: 102,
+      name: "Mobile",
+      category: "Electronics",
+      quantity: 0,
+      price: 25000,
+      active: true
+    },
+    {
+      id: 103,
+      name: "Old Printer",
+      category: "Office",
+      quantity: 2,
+      price: 8000,
+      active: false
+    }
+  ];
+
+  const visibleProducts = products.filter((product) => product.active);
+
+  return (
+    <div>
+      <h2>Product Inventory</h2>
+
+      {visibleProducts.length === 0 ? (
+        <p>No active products.</p>
+      ) : (
+        visibleProducts.map((product) => (
+          <article key={product.id}>
+            <h3>{product.name}</h3>
+            <p>Category: {product.category}</p>
+            <p>Price: ₹{product.price}</p>
+
+            {product.quantity === 0 ? (
+              <p>Out of stock</p>
+            ) : product.quantity < 5 ? (
+              <p>Low stock: {product.quantity} remaining</p>
+            ) : (
+              <p>In stock: {product.quantity}</p>
+            )}
+
+            {product.price >= 50000 && <p>Premium product</p>}
+          </article>
+        ))
+      )}
+    </div>
+  );
+}
+
+This final example combines:
+- Filtering active products
+- Handling an empty result
+- Mapping an array to JSX
+- Conditional stock messages
+- Nested ternary conditions
+- Conditional premium labels
+
+============================================================
+COMMON MISTAKES AND BEST PRACTICES
+============================================================
+
+1. Mistake: Rendering 0 unintentionally
+   Avoid: {quantity && <p>In stock</p>}
+   Prefer: {quantity > 0 && <p>In stock</p>}
+
+2. Mistake: Forgetting the alternative in a ternary
+   Incorrect: {isLoggedIn ? <p>Welcome</p>}
+   Correct:   {isLoggedIn ? <p>Welcome</p> : <p>Please log in</p>}
+   If there is no alternative, use && when appropriate.
+
+3. Mistake: Using if directly inside JSX braces
+   Incorrect: <div>{if (ready) ...}</div>
+   Correct: Use a ternary/&& expression, or decide the content before return.
+
+4. Mistake: Missing list keys
+   Prefer: items.map(item => <p key={item.id}>{item.name}</p>)
+   Use stable unique identifiers, not array indexes when items can be reordered.
+
+5. Mistake: Treating UI visibility as security
+   Hiding an admin control does not protect the API. Enforce authorization on
+   the backend.
+
+6. Mistake: Overusing nested ternaries
+   For complex branches, use if/else, switch, or a small helper component.
+
+7. Mistake: Mutating state directly
+   With useState, use the setter function so React can render the updated UI.
+
+8. Mistake: Assuming a hard-coded loading flag simulates an API
+   Real data fetching needs asynchronous logic and explicit loading, error,
+   and success states.
+
+============================================================
+PRACTICE EXERCISES
+============================================================
+
+Beginner:
+1. Display "Adult" if age >= 18, otherwise "Minor".
+2. Display "Pass" if marks >= 40, otherwise "Fail".
+3. Show "Welcome" only when isLoggedIn is true.
+4. Show "No products found" when an array is empty.
+5. Display "Free delivery" when cart total >= 1000.
+
+Intermediate:
+6. Show or hide employee details using useState.
+7. Display stock status: Out of stock at 0, Low stock from 1 to 4,
+   In stock at 5 or more.
+8. Render different dashboards for admin, manager, and user.
+9. Display a validation error when an email input is empty or invalid.
+10. Add tabs for Profile, Orders, and Settings.
+11. Show a password length message while the user types.
+12. Display a notification that can be dismissed.
+13. Filter a product array to show only active products.
+14. Show the previous/next pagination buttons only when appropriate.
+15. Display different payment forms based on a selected payment method.
+
+Advanced:
+16. Create loading/error/success UI states for a simulated API request.
+17. Use a TypeScript discriminated union for order statuses.
+18. Create an inventory list with empty, low-stock, and available states.
+19. Add role-based UI and explain why backend authorization is still required.
+20. Create a product search with separate empty-query and no-results messages.
+
+============================================================
+QUICK REFERENCE
+============================================================
+
+IF / ELSE:
+if (condition) return <A />;
+return <B />;
+
+TERNARY:
+{condition ? <A /> : <B />}
+
+LOGICAL AND:
+{condition && <A />}
+
+FALLBACK:
+{name || "Guest"}
+
+NULLISH FALLBACK:
+{value ?? defaultValue}
+
+CONDITIONAL COMPONENT:
+{showPanel && <Panel />}
+
+RETURN NOTHING:
+if (!visible) return null;
+
+CONDITIONAL CLASS:
+className={isActive ? "active" : "inactive"}
+
+CONDITIONAL STYLE:
+style={{ color: isError ? "red" : "green" }}
+
+STATE-DRIVEN TOGGLE:
+const [visible, setVisible] = useState(false);
+<button onClick={() => setVisible(!visible)}>Toggle</button>
+{visible && <p>Now visible</p>}
+
+END OF TUTORIAL

@@ -1,0 +1,57 @@
+{
+  "taj-palace-delhi": {
+    "query": "luxury hotel lobby chandelier",
+    "photographer": "Tomas Anunziata",
+    "page": "https://www.pexels.com/photo/spacious-lobby-interior-of-luxury-hotel-695193/"
+  },
+  "oberoi-mumbai": {
+    "query": "luxury hotel room interior elegant",
+    "photographer": "Rahib Yaqubov",
+    "page": "https://www.pexels.com/photo/bedroom-reflection-on-the-mirror-14547139/"
+  },
+  "itc-grand-chola": {
+    "query": "luxury hotel suite living room",
+    "photographer": "Moussa Idrissi",
+    "page": "https://www.pexels.com/photo/bright-elegant-hotel-suite-interior-design-34645062/"
+  },
+  "marriott-bengaluru": {
+    "query": "Marriott hotel Bengaluru",
+    "photographer": "Abhishek  Navlakha",
+    "page": "https://www.pexels.com/photo/modern-architecture-in-hong-kong-urban-area-30542439/"
+  },
+  "taj-mahal-palace": {
+    "query": "Taj Mahal Palace hotel Mumbai",
+    "photographer": "Manish Dhodi",
+    "page": "https://www.pexels.com/photo/the-taj-mahal-palace-hotel-in-mumbai-at-twilight-31016952/"
+  },
+  "fallback-1": {
+    "query": "hotel lobby interior",
+    "photographer": "Quang Nguyen Vinh",
+    "page": "https://www.pexels.com/photo/hallway-in-modern-hotel-26729563/"
+  },
+  "fallback-2": {
+    "query": "hotel room interior",
+    "photographer": "Lukas Rychvalsky",
+    "page": "https://www.pexels.com/photo/white-and-black-curtains-2889618/"
+  },
+  "fallback-3": {
+    "query": "hotel suite interior",
+    "photographer": "Real  Estate 4k",
+    "page": "https://www.pexels.com/photo/view-of-a-modern-hotel-room-18651505/"
+  },
+  "fallback-4": {
+    "query": "hotel swimming pool resort",
+    "photographer": "Darrell Fraser",
+    "page": "https://www.pexels.com/photo/swimming-pool-beside-cottages-2259226/"
+  },
+  "fallback-5": {
+    "query": "luxury resort exterior",
+    "photographer": "Enes \u00c7elik",
+    "page": "https://www.pexels.com/photo/birds-eye-view-of-resort-with-pool-7748791/"
+  },
+  "fallback-6": {
+    "query": "hotel restaurant interior",
+    "photographer": "Quang Nguyen Vinh",
+    "page": "https://www.pexels.com/photo/tables-in-a-restaurant-12387869/"
+  }
+}

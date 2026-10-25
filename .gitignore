@@ -75,3 +75,55 @@ $RECYCLE.BIN/
 node_modules/
 npm-debug.log*
 yarn-debug.log*
+
+# ==============================
+# Java / Maven build output
+# (re-created by every build - never commit)
+# ==============================
+target/
+bin/
+out/
+*.class
+*.jar
+*.war
+*.ear
+hs_err_pid*
+logs/
+# Maven wrapper: keep mvnw / mvnw.cmd / maven-wrapper.properties, ignore the downloaded jar
+.mvn/wrapper/maven-wrapper.jar
+
+# ==============================
+# Eclipse / Spring Tool Suite
+# (every project has a pom.xml: re-import with
+#  File > Import > Maven > Existing Maven Projects)
+# ==============================
+.metadata/
+.recommenders/
+.settings/
+.classpath
+.project
+.factorypath
+.apt_generated/
+.apt_generated_tests/
+.springBeans
+.sts4-cache/
+.loadpath
+*.launch
+
+# IntelliJ / NetBeans extras
+*.iws
+*.ipr
+nbproject/private/
+
+# ==============================
+# Front-end build output (React / Vite)
+# ==============================
+dist-ssr/
+*.local
+
+# ==============================
+# Local secrets (database passwords, JWT keys)
+# ==============================
+db.properties
+db-secret.properties
+secrets.properties

@@ -1,0 +1,85 @@
+version: '3.8'
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: mohit123
+    volumes:
+      - csbmicroservices:/var/lib/mysql
+    ports:
+      - "3307:3306"
+    networks:
+      - csbmicroservicesnetwork
+
+  eureka:
+    build: ./eureka-server
+    image: eurekaserverimage
+    container_name: eureka-service
+    volumes:
+      - csbmicroservices:/microservices/data
+    ports:
+      - "8761:8761"
+    networks:
+      - csbmicroservicesnetwork
+
+  gateway:
+    build: ./api-gateway
+    image: apigatewayimage
+    container_name: gateway-service
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka:8761/eureka
+    volumes:
+      - csbmicroservices:/microservices/data
+    ports:
+      - "8765:8765"
+    networks:
+      - csbmicroservicesnetwork
+    depends_on:
+      - eureka
+
+  accountservice:
+    build: ./account-service
+    image: accountserviceimage
+    container_name: account-service
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka:8761/eureka
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/account_service?createDatabaseIfNotExist=true
+    volumes:
+      - csbmicroservices:/microservices/data
+    ports:
+      - "8082:8082"
+    networks:
+      - csbmicroservicesnetwork
+    depends_on:
+      - eureka
+      - gateway
+      - mysql
+
+  customerservice:
+    build: ./customer-service
+    image: customerserviceimage
+    container_name: customer-service
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka:8761/eureka
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/customer_service?createDatabaseIfNotExist=true
+    volumes:
+      - csbmicroservices:/microservices/data
+    ports:
+      - "8081:8081"
+    networks:
+      - csbmicroservicesnetwork
+    depends_on:
+      - eureka
+      - gateway
+      - mysql
+
+networks:
+  csbmicroservicesnetwork:
+    name: csbmicroservicesnetwork
+    external: true
+
+volumes:
+  csbmicroservices:
+    name: csbmicroservices
+    external: true

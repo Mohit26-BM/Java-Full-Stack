@@ -3,6 +3,7 @@ package com.example.springDemo.controller;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,27 +31,32 @@ public class CustomerController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public List<CustomerResponse> getAllCustomers() {
         return service.getAllCustomers();
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
     public CustomerResponse addCustomer(@Valid @RequestBody CustomerRequest request) {
         return service.addCustomer(request);
     }
 
     @GetMapping("/{customerId}")
+    @PreAuthorize("@access.canAccess(authentication, #customerId)")
     public CustomerResponse getCustomer(@PathVariable Long customerId) {
         return service.getCustomer(customerId);
     }
 
     @GetMapping("/savings/{customerId}")
+    @PreAuthorize("@access.canAccess(authentication, #customerId)")
     public List<SavingsAccountResponse> getSavings(@PathVariable Long customerId) {
         return service.getSavings(customerId);
     }
 
     @GetMapping("/loans/{customerId}")
+    @PreAuthorize("@access.canAccess(authentication, #customerId)")
     public List<LoanResponse> getLoans(@PathVariable Long customerId) {
         return service.getLoans(customerId);
     }

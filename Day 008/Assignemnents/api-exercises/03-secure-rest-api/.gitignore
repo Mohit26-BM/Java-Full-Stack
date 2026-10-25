@@ -1,0 +1,4 @@
+target/
+
+# Contains the MySQL password and the JWT signing secret
+src/main/resources/secrets.properties

@@ -1,0 +1,1422 @@
+REACT 19 + TYPESCRIPT
+EVENTS, EVENT HANDLING, AND LISTS
+Detailed Tutorial with Complete Examples
+
+
+HOW TO CREATE THE PROJECT
+-------------------------
+Open a terminal and run:
+
+npm create vite@latest react-events-lists -- --template react-ts
+cd react-events-lists
+npm install
+npm run dev
+
+Open the local URL printed by Vite.
+
+For each example:
+1. Create a file such as Example1.tsx inside src.
+2. Paste the example into that file.
+3. Import the component into App.tsx and render it.
+
+Example App.tsx:
+import Example1 from "./Example1";
+
+export default function App() {
+  return <Example1 />;
+}
+
+Each numbered example is a separate component. Do not paste all examples
+into one file unchanged, because several examples use the same names and
+imports. For examples using state, include:
+import { useState } from "react";
+
+============================================================
+PART 1 — UNDERSTANDING EVENTS IN REACT
+============================================================
+
+1. WHAT IS AN EVENT?
+--------------------
+An event is an action or occurrence detected by the browser. Examples include:
+
+- Clicking a button
+- Typing or changing an input
+- Submitting a form
+- Selecting an option
+- Pressing a keyboard key
+- Moving the pointer over an element
+- Focusing or leaving an input
+
+React lets a component respond to these events by passing a function to a
+JSX event prop.
+
+Common React event props:
+- onClick
+- onChange
+- onInput
+- onSubmit
+- onKeyDown
+- onKeyUp
+- onMouseEnter
+- onMouseLeave
+- onFocus
+- onBlur
+- onDoubleClick
+- onCopy
+
+<button onClick={ showAlert } >Click</button>
+<div onClick={showAlert}>Click Para</div>
+
+function showAlert(){
+	alert("Alert messge is called");
+}
+
+React event props use camelCase. For example, use onClick rather than onclick.
+
+2. HOW EVENT HANDLING WORKS
+---------------------------
+The basic pattern is:
+
+function handleClick() {
+  console.log("Clicked!");
+}
+
+() => console.log("clicked!");
+
+
+<button onClick={() => console.log("clicked!");}>Click me</button>
+
+When the user clicks the button, React invokes handleClick.
+
+Important:
+CORRECT:   onClick={handleClick}
+USUALLY WRONG: onClick={handleClick()}
+
+The second version calls handleClick while React is rendering. To pass
+arguments, use an arrow function:
+
+<button onClick={() => handleDelete(10)}>Delete</button>
+
+The arrow function is called on the click, and it then calls handleDelete(10).
+
+3. EXAMPLE: SIMPLE CLICK EVENT
+------------------------------
+function ClickExample() {
+  function handleClick() {
+    alert("The button was clicked!");
+  }
+
+  return (
+    <div>
+      <h2>React Click Event</h2>
+      <button onClick={handleClick}>Click Me</button>
+    </div>
+  );
+}
+
+export default ClickExample;
+
+Explanation:
+- handleClick is a JavaScript function.
+- onClick registers the function as the click handler.
+- React calls the handler when the user clicks.
+- The alert is only for demonstration; applications often update state instead.
+
+4. EXAMPLE: INLINE HANDLER
+--------------------------
+function InlineHandler() {
+  return (
+    <button onClick={() => alert("Hello from React!")}>
+      Say Hello
+    </button>
+  );
+}
+
+Inline handlers are convenient for short actions. For complicated logic,
+prefer a named function to improve readability.
+
+5. EXAMPLE: PASSING ARGUMENTS
+-----------------------------
+function GreetingButtons() {
+  function greet(name: string) {
+    alert(`Hello, ${name}!`);
+  }
+
+  return (
+    <div>
+      <button onClick={() => greet("Ananya")}>Greet Ananya</button>
+      <button onClick={() => greet("Rahul")}>Greet Rahul</button>
+    </div>
+  );
+}
+
+The handler receives the value supplied by the arrow function. This pattern
+is particularly useful for a list of products, students, or employees.
+
+============================================================
+PART 2 — EVENTS AND REACT STATE
+============================================================
+
+6. EXAMPLE: CLICK COUNTER
+-------------------------
+import { useState } from "react";
+
+function ClickCounter() {
+  const [count, setCount] = useState<number>(0);
+
+  function increment() {
+    setCount(count + 1);
+  }
+
+  return (
+    <div>
+      <h2>Count: {count}</h2>
+      <button onClick={increment}>Increment</button>
+    </div>
+  );
+}
+
+export default ClickCounter;
+
+useState stores data between renders. Calling setCount schedules a re-render,
+so the displayed count changes. Do not assign directly to count.
+
+7. EXAMPLE: INCREMENT, DECREMENT, AND RESET
+-------------------------------------------
+import { useState } from "react";
+
+function CounterControls() {
+  const [count, setCount] = useState<number>(0);
+
+  return (
+    <div>
+      <h2>Count: {count}</h2>
+      <button onClick={() => setCount(previous => previous + 1)}>
+        Increment
+      </button>
+      <button onClick={() => setCount(previous => previous - 1)}>
+        Decrement
+      </button>
+      <button onClick={() => setCount(0)}>Reset</button>
+    </div>
+  );
+}
+
+The updater function receives the previous state. Prefer this form when the
+new state depends on the previous state.
+
+8. EXAMPLE: TOGGLE A MESSAGE
+----------------------------
+import { useState } from "react";
+
+function ToggleMessage() {
+  const [visible, setVisible] = useState<boolean>(false);
+
+  return (
+    <div>
+      <button onClick={() => setVisible(previous => !previous)}>
+        {visible ? "Hide message" : "Show message"}
+      </button>
+
+      {visible && <p>The message is visible now.</p>}
+    </div>
+  );
+}
+
+This example combines event handling, state, and conditional rendering.
+
+============================================================
+PART 3 — FORM AND INPUT EVENTS
+============================================================
+
+9. EXAMPLE: TEXT INPUT WITH onChange
+------------------------------------
+import { useState } from "react";
+
+function NameInput() {
+  const [name, setName] = useState<string>("");
+
+  return (
+    <div>
+      <label>
+        Your name:
+        <input
+          value={name}
+          onChange={event => setName(event.target.value)}
+          placeholder="Enter your name"
+        />
+      </label>
+      <p>Hello, {name || "Guest"}!</p>
+    </div>
+  );
+}
+
+This is a controlled input: React state controls the value shown in the input.
+When the user types, onChange updates state, and React renders the new value.
+
+10. EXAMPLE: A TYPED CHANGE HANDLER
+-----------------------------------
+import { useState } from "react";
+import type { ChangeEvent } from "react";
+
+function EmailInput() {
+  const [email, setEmail] = useState<string>("");
+
+  function handleEmailChange(event: ChangeEvent<HTMLInputElement>) {
+    setEmail(event.target.value);
+  }
+
+  return (
+    <div>
+      <label>
+        Email:
+        <input type="email" value={email} onChange={handleEmailChange} />
+      </label>
+      <p>Current email: {email}</p>
+    </div>
+  );
+}
+
+TypeScript often infers event types in inline handlers. Explicit types are
+useful for named reusable functions. Use ChangeEvent<HTMLTextAreaElement> for
+textarea and ChangeEvent<HTMLSelectElement> for select elements.
+
+11. EXAMPLE: TEXTAREA AND CHARACTER COUNT
+-----------------------------------------
+import { useState } from "react";
+
+function FeedbackBox() {
+  const [feedback, setFeedback] = useState<string>("");
+
+  return (
+    <div>
+      <label>
+        Feedback:
+        <textarea
+          value={feedback}
+          onChange={event => setFeedback(event.target.value)}
+          rows={4}
+        />
+      </label>
+      <p>Characters typed: {feedback.length}</p>
+      <p>{feedback}</p>
+    </div>
+  );
+}
+
+12. EXAMPLE: SELECT DROPDOWN
+----------------------------
+import { useState } from "react";
+
+function CitySelector() {
+  const [city, setCity] = useState<string>("Hyderabad");
+
+  return (
+    <div>
+      <label>
+        Choose a city:
+        <select value={city} onChange={event => setCity(event.target.value)}>
+          <option value="Hyderabad">Hyderabad</option>
+          <option value="Bengaluru">Bengaluru</option>
+          <option value="Chennai">Chennai</option>
+          <option value="Pune">Pune</option>
+        </select>
+      </label>
+      <p>Selected city: {city}</p>
+    </div>
+  );
+}
+
+13. EXAMPLE: CHECKBOX
+--------------------
+import { useState } from "react";
+
+function TermsCheckbox() {
+  const [accepted, setAccepted] = useState<boolean>(false);
+
+  return (
+    <div>
+      <label>
+        <input
+          type="checkbox"
+          checked={accepted}
+          onChange={event => setAccepted(event.target.checked)}
+        />
+        I accept the terms and conditions.
+      </label>
+      <p>Status: {accepted ? "Accepted" : "Not accepted"}</p>
+      <button disabled={!accepted}>Continue</button>
+    </div>
+  );
+}
+
+For a checkbox, use event.target.checked to read true or false. The checked
+prop makes the checkbox controlled by state.
+
+14. EXAMPLE: RADIO BUTTONS
+--------------------------
+import { useState } from "react";
+
+function CourseSelector() {
+  const [course, setCourse] = useState<string>("React");
+
+  const courses = ["React", "Java", "Python"];
+
+  return (
+    <div>
+      {courses.map(item => (
+        <label key={item} style={{ display: "block" }}>
+          <input
+            type="radio"
+            name="course"
+            value={item}
+            checked={course === item}
+            onChange={event => setCourse(event.target.value)}
+          />
+          {item}
+        </label>
+      ))}
+      <p>Selected course: {course}</p>
+    </div>
+  );
+}
+
+15. EXAMPLE: FORM SUBMISSION
+----------------------------
+import { useState } from "react";
+import type { FormEvent } from "react";
+
+function LoginForm() {
+  const [username, setUsername] = useState<string>("");
+  const [message, setMessage] = useState<string>("");
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setMessage(`Form submitted for ${username || "unknown user"}.`);
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <label>
+        Username:
+        <input
+          value={username}
+          onChange={event => setUsername(event.target.value)}
+        />
+      </label>
+      <button type="submit">Submit</button>
+      <p role="status">{message}</p>
+    </form>
+  );
+}
+
+event.preventDefault() prevents the browser's default form submission, which
+would normally navigate or reload the page. A real application should validate
+the data and submit it to an API.
+
+16. EXAMPLE: SIMPLE FORM VALIDATION
+-----------------------------------
+import { useState } from "react";
+import type { FormEvent } from "react";
+
+function EmailValidation() {
+  const [email, setEmail] = useState<string>("");
+  const [message, setMessage] = useState<string>("");
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (!email.trim().includes("@")) {
+      setMessage("Please enter an email address containing @.");
+      return;
+    }
+
+    setMessage("The basic email check passed.");
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <label>
+        Email:
+        <input
+          type="email"
+          value={email}
+          onChange={event => setEmail(event.target.value)}
+        />
+      </label>
+      <button type="submit">Validate</button>
+      <p role="status">{message}</p>
+    </form>
+  );
+}
+
+This is a small teaching check, not comprehensive email validation.
+
+============================================================
+PART 4 — MOUSE, FOCUS, AND KEYBOARD EVENTS
+============================================================
+
+17. EXAMPLE: MOUSE ENTER AND LEAVE
+----------------------------------
+import { useState } from "react";
+
+function MouseEvents() {
+  const [message, setMessage] = useState("Move the pointer over this box.");
+
+  return (
+    <div
+      onMouseEnter={() => setMessage("Pointer entered the box.")}
+      onMouseLeave={() => setMessage("Pointer left the box.")}
+      style={{ border: "1px solid #777", padding: 24, margin: 12 }}
+    >
+      <p>{message}</p>
+    </div>
+  );
+}
+
+18. EXAMPLE: FOCUS AND BLUR
+---------------------------
+import { useState } from "react";
+
+function FocusEvents() {
+  const [message, setMessage] = useState("Input is not focused.");
+
+  return (
+    <div>
+      <input
+        onFocus={() => setMessage("Input is focused.")}
+        onBlur={() => setMessage("Input lost focus.")}
+        placeholder="Click or tab into this input"
+      />
+      <p>{message}</p>
+    </div>
+  );
+}
+
+19. EXAMPLE: KEYBOARD EVENTS
+----------------------------
+import { useState } from "react";
+import type { KeyboardEvent } from "react";
+
+function KeyboardEvents() {
+  const [message, setMessage] = useState("Type in the input.");
+
+  function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+    if (event.key === "Enter") {
+      setMessage("Enter key pressed.");
+    } else if (event.key === "Escape") {
+      setMessage("Escape key pressed.");
+    } else {
+      setMessage(`Key pressed: ${event.key}`);
+    }
+  }
+
+  return (
+    <div>
+      <input onKeyDown={handleKeyDown} placeholder="Press a key" />
+      <p>{message}</p>
+    </div>
+  );
+}
+
+20. EXAMPLE: DOUBLE CLICK
+------------------------
+function DoubleClickExample() {
+  return (
+    <button onDoubleClick={() => alert("Double-click detected!")}>
+      Double-click me
+    </button>
+  );
+}
+
+============================================================
+PART 5 — EVENT PROPAGATION AND EVENT OBJECTS
+============================================================
+
+21. EVENT BUBBLING
+------------------
+When an event occurs on a nested element, it commonly bubbles up through
+ancestor elements. A click on a button inside a clickable div can trigger both
+the button's handler and the div's handler.
+
+EXAMPLE:
+function BubblingExample() {
+  return (
+    <div
+      onClick={() => alert("Parent clicked")}
+      style={{ padding: 24, border: "1px solid gray" }}
+    >
+      <button onClick={() => alert("Button clicked")}>
+        Click me
+      </button>
+    </div>
+  );
+}
+
+Click the button and both alerts may appear: first the button handler, then
+the parent handler.
+
+22. STOP EVENT PROPAGATION
+--------------------------
+function StopPropagationExample() {
+  return (
+    <div
+      onClick={() => alert("Parent handler")}
+      style={{ padding: 24, border: "1px solid gray" }}
+    >
+      <button
+        onClick={event => {
+          event.stopPropagation();
+          alert("Button handler only");
+        }}
+      >
+        Stop bubbling
+      </button>
+    </div>
+  );
+}
+
+stopPropagation() prevents the event from reaching ancestor handlers. Use it
+only when that behaviour is intended.
+
+23. PREVENT DEFAULT BROWSER BEHAVIOUR
+-------------------------------------
+function PreventDefaultExample() {
+  return (
+    <a
+      href="https://example.com"
+      onClick={event => {
+        event.preventDefault();
+        alert("Navigation was prevented.");
+      }}
+    >
+      Click this link
+    </a>
+  );
+}
+
+preventDefault() stops the browser's default action, such as following a link
+or performing the normal form submission.
+
+Difference:
+- stopPropagation(): controls whether the event bubbles to ancestors.
+- preventDefault(): prevents the browser's default action.
+They solve different problems.
+
+24. READ THE EVENT TARGET
+-------------------------
+function EventTargetExample() {
+  function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
+    console.log("Current value:", event.target.value);
+  }
+
+  return <input onChange={handleChange} placeholder="Type and inspect console" />;
+}
+
+event.target refers to the element that originated the event. React's event
+object provides properties such as target, currentTarget, key, and methods
+such as preventDefault() and stopPropagation().
+
+============================================================
+PART 6 — LISTS IN REACT
+============================================================
+
+25. WHAT IS LIST RENDERING?
+---------------------------
+List rendering means displaying repeated UI from an array. JavaScript's map()
+method transforms each array item into JSX.
+
+General pattern:
+items.map(item => <li key={item.id}>{item.name}</li>)
+
+A key helps React match list items between renders. Prefer stable unique IDs,
+such as database IDs. Keys must be unique among siblings, not necessarily
+across the entire application.
+
+26. EXAMPLE: SIMPLE STRING ARRAY
+--------------------------------
+function FruitList() {
+  const fruits: string[] = ["Apple", "Banana", "Mango", "Orange"];
+
+  return (
+    <div>
+      <h2>Fruits</h2>
+      <ul>
+        {fruits.map(fruit => <li key={fruit}>{fruit}</li>)}
+      </ul>
+    </div>
+  );
+}
+
+The fruit string is a reasonable key here because each value is unique.
+If duplicates are possible, use objects with unique IDs.
+
+27. EXAMPLE: ARRAY OF OBJECTS
+-----------------------------
+interface Student {
+  id: number;
+  name: string;
+  course: string;
+}
+
+function StudentList() {
+  const students: Student[] = [
+    { id: 1, name: "Ananya", course: "React" },
+    { id: 2, name: "Rahul", course: "Java" },
+    { id: 3, name: "Kiran", course: "Python" }
+  ];
+
+  return (
+    <div>
+      <h2>Students</h2>
+      {students.map(student => (
+        <article key={student.id}>
+          <h3>{student.name}</h3>
+          <p>Course: {student.course}</p>
+        </article>
+      ))}
+    </div>
+  );
+}
+
+28. EXAMPLE: PRODUCT TABLE
+--------------------------
+interface Product {
+  id: number;
+  name: string;
+  category: string;
+  quantity: number;
+}
+
+function ProductTable() {
+  const products: Product[] = [
+    { id: 101, name: "Laptop", category: "Electronics", quantity: 10 },
+    { id: 102, name: "Mobile", category: "Electronics", quantity: 0 },
+    { id: 103, name: "Chair", category: "Furniture", quantity: 15 }
+  ];
+
+  return (
+    <table border={1} cellPadding={8}>
+      <thead>
+        <tr>
+          <th>ID</th><th>Name</th><th>Category</th><th>Quantity</th>
+        </tr>
+      </thead>
+      <tbody>
+        {products.map(product => (
+          <tr key={product.id}>
+            <td>{product.id}</td>
+            <td>{product.name}</td>
+            <td>{product.category}</td>
+            <td>{product.quantity}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
+
+29. EXAMPLE: CONDITIONAL CONTENT IN A LIST
+------------------------------------------
+interface StockProduct {
+  id: number;
+  name: string;
+  quantity: number;
+}
+
+function StockList() {
+  const products: StockProduct[] = [
+    { id: 1, name: "Laptop", quantity: 5 },
+    { id: 2, name: "Mobile", quantity: 0 },
+    { id: 3, name: "Keyboard", quantity: 2 }
+  ];
+
+  return (
+    <ul>
+      {products.map(product => (
+        <li key={product.id}>
+          {product.name} — {product.quantity > 0
+            ? `Available (${product.quantity})`
+            : "Out of stock"}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+30. EXAMPLE: EMPTY LIST MESSAGE
+-------------------------------
+function EmptyList() {
+  const tasks: string[] = [];
+
+  return (
+    <div>
+      <h2>Tasks</h2>
+      {tasks.length === 0 ? (
+        <p>No tasks are available.</p>
+      ) : (
+        <ul>{tasks.map(task => <li key={task}>{task}</li>)}</ul>
+      )}
+    </div>
+  );
+}
+
+Always design an empty state for lists that might receive no data from a user,
+API, or database.
+
+31. EXAMPLE: FILTER A LIST
+--------------------------
+interface Employee {
+  id: number;
+  name: string;
+  active: boolean;
+}
+
+function ActiveEmployees() {
+  const employees: Employee[] = [
+    { id: 1, name: "Ravi", active: true },
+    { id: 2, name: "Meena", active: false },
+    { id: 3, name: "Sana", active: true }
+  ];
+
+  const activeEmployees = employees.filter(employee => employee.active);
+
+  return (
+    <ul>
+      {activeEmployees.map(employee => (
+        <li key={employee.id}>{employee.name}</li>
+      ))}
+    </ul>
+  );
+}
+
+filter() selects matching items. map() transforms the selected items into JSX.
+
+32. EXAMPLE: SORT A LIST
+------------------------
+function SortedNames() {
+  const names = ["Ravi", "Ananya", "Kiran"];
+  const sortedNames = [...names].sort((a, b) => a.localeCompare(b));
+
+  return <ol>{sortedNames.map(name => <li key={name}>{name}</li>)}</ol>;
+}
+
+sort() mutates the array it is called on. The spread syntax copies the array
+first, preventing changes to the original array.
+
+33. EXAMPLE: SEARCH PRODUCTS
+----------------------------
+import { useState } from "react";
+
+interface SearchProduct {
+  id: number;
+  name: string;
+  category: string;
+}
+
+function ProductSearch() {
+  const [search, setSearch] = useState<string>("");
+
+  const products: SearchProduct[] = [
+    { id: 1, name: "Laptop", category: "Electronics" },
+    { id: 2, name: "Mobile", category: "Electronics" },
+    { id: 3, name: "Chair", category: "Furniture" },
+    { id: 4, name: "Monitor", category: "Electronics" }
+  ];
+
+  const results = products.filter(product =>
+    `${product.name} ${product.category}`
+      .toLowerCase()
+      .includes(search.toLowerCase())
+  );
+
+  return (
+    <div>
+      <input
+        value={search}
+        onChange={event => setSearch(event.target.value)}
+        placeholder="Search by name or category"
+      />
+      {results.length === 0 ? (
+        <p>No matching products found.</p>
+      ) : (
+        <ul>
+          {results.map(product => (
+            <li key={product.id}>
+              {product.name} ({product.category})
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+============================================================
+PART 7 — UPDATING LISTS WITH EVENTS
+============================================================
+
+34. EXAMPLE: ADD AN ITEM
+------------------------
+import { useState } from "react";
+
+interface Task {
+  id: number;
+  title: string;
+}
+
+function AddTask() {
+  const [tasks, setTasks] = useState<Task[]>([
+    { id: 1, title: "Learn JSX" },
+    { id: 2, title: "Learn props" }
+  ]);
+  const [title, setTitle] = useState<string>("");
+
+  function addTask() {
+    const trimmedTitle = title.trim();
+    if (!trimmedTitle) return;
+
+    setTasks(previous => [
+      ...previous,
+      { id: Date.now(), title: trimmedTitle }
+    ]);
+    setTitle("");
+  }
+
+  return (
+    <div>
+      <input
+        value={title}
+        onChange={event => setTitle(event.target.value)}
+        placeholder="New task"
+      />
+      <button onClick={addTask}>Add task</button>
+      <ul>{tasks.map(task => <li key={task.id}>{task.title}</li>)}</ul>
+    </div>
+  );
+}
+
+The spread syntax creates a new array. Date.now() is acceptable for a small
+demo, but a backend-generated ID or robust ID generator is better in production.
+
+35. EXAMPLE: REMOVE AN ITEM
+---------------------------
+import { useState } from "react";
+
+interface Task {
+  id: number;
+  title: string;
+}
+
+function RemoveTask() {
+  const [tasks, setTasks] = useState<Task[]>([
+    { id: 1, title: "Learn events" },
+    { id: 2, title: "Learn lists" },
+    { id: 3, title: "Practice React" }
+  ]);
+
+  function removeTask(id: number) {
+    setTasks(previous => previous.filter(task => task.id !== id));
+  }
+
+  return (
+    <ul>
+      {tasks.map(task => (
+        <li key={task.id}>
+          {task.title}
+          <button onClick={() => removeTask(task.id)}>Remove</button>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+36. EXAMPLE: UPDATE AN ITEM
+---------------------------
+import { useState } from "react";
+
+interface Task {
+  id: number;
+  title: string;
+  completed: boolean;
+}
+
+function ToggleTaskCompletion() {
+  const [tasks, setTasks] = useState<Task[]>([
+    { id: 1, title: "Learn React", completed: false },
+    { id: 2, title: "Practice TypeScript", completed: false }
+  ]);
+
+  function toggleTask(id: number) {
+    setTasks(previous =>
+      previous.map(task =>
+        task.id === id
+          ? { ...task, completed: !task.completed }
+          : task
+      )
+    );
+  }
+
+  return (
+    <ul>
+      {tasks.map(task => (
+        <li key={task.id}>
+          <label>
+            <input
+              type="checkbox"
+              checked={task.completed}
+              onChange={() => toggleTask(task.id)}
+            />
+            {task.completed ? <s>{task.title}</s> : task.title}
+          </label>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+Use map() to make a new array and the object spread syntax to create a new
+object for the item that changes. Do not mutate state directly.
+
+37. EXAMPLE: SELECT AN ITEM
+---------------------------
+import { useState } from "react";
+
+interface ColorItem {
+  id: number;
+  name: string;
+}
+
+function SelectableList() {
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const colors: ColorItem[] = [
+    { id: 1, name: "Red" },
+    { id: 2, name: "Green" },
+    { id: 3, name: "Blue" }
+  ];
+
+  const selected = colors.find(color => color.id === selectedId);
+
+  return (
+    <div>
+      {colors.map(color => (
+        <button
+          key={color.id}
+          onClick={() => setSelectedId(color.id)}
+          aria-pressed={selectedId === color.id}
+        >
+          {color.name}
+        </button>
+      ))}
+      <p>Selected: {selected?.name ?? "None"}</p>
+    </div>
+  );
+}
+
+38. EXAMPLE: TODO CHECKLIST
+---------------------------
+import { useState } from "react";
+
+interface Todo {
+  id: number;
+  title: string;
+  done: boolean;
+}
+
+function TodoChecklist() {
+  const [todos, setTodos] = useState<Todo[]>([
+    { id: 1, title: "Read documentation", done: false },
+    { id: 2, title: "Write a component", done: true },
+    { id: 3, title: "Practice events", done: false }
+  ]);
+
+  function toggleTodo(id: number) {
+    setTodos(previous =>
+      previous.map(todo =>
+        todo.id === id ? { ...todo, done: !todo.done } : todo
+      )
+    );
+  }
+
+  const completedCount = todos.filter(todo => todo.done).length;
+
+  return (
+    <div>
+      <h2>Todo List</h2>
+      <p>Completed {completedCount} of {todos.length}</p>
+      {todos.map(todo => (
+        <label key={todo.id} style={{ display: "block" }}>
+          <input
+            type="checkbox"
+            checked={todo.done}
+            onChange={() => toggleTodo(todo.id)}
+          />
+          {todo.done ? <s>{todo.title}</s> : todo.title}
+        </label>
+      ))}
+    </div>
+  );
+}
+
+============================================================
+PART 8 — COMPLETE MINI PROJECT: PRODUCT MANAGER
+============================================================
+
+This single component combines:
+- Product objects with id, name, category, and quantity
+- Controlled input fields
+- Click handlers
+- Add and remove operations
+- Search/filter
+- Conditional stock status
+- Empty results
+- Stable list keys
+- Immutable state updates
+
+Create ProductManager.tsx:
+
+import { useState } from "react";
+
+interface Product {
+  id: number;
+  name: string;
+  category: string;
+  quantity: number;
+}
+
+export default function ProductManager() {
+  const [products, setProducts] = useState<Product[]>([
+    { id: 101, name: "Laptop", category: "Electronics", quantity: 10 },
+    { id: 102, name: "Mobile", category: "Electronics", quantity: 0 },
+    { id: 103, name: "Chair", category: "Furniture", quantity: 3 }
+  ]);
+
+  const [name, setName] = useState<string>("");
+  const [category, setCategory] = useState<string>("General");
+  const [quantity, setQuantity] = useState<string>("1");
+  const [search, setSearch] = useState<string>("");
+
+  function addProduct() {
+    const cleanName = name.trim();
+    const parsedQuantity = Number(quantity);
+
+    if (!cleanName) {
+      alert("Enter a product name.");
+      return;
+    }
+
+    if (
+      quantity.trim() === "" ||
+      !Number.isInteger(parsedQuantity) ||
+      parsedQuantity < 0
+    ) {
+      alert("Quantity must be a non-negative whole number.");
+      return;
+    }
+
+    const product: Product = {
+      id: Date.now(),
+      name: cleanName,
+      category: category.trim() || "General",
+      quantity: parsedQuantity
+    };
+
+    setProducts(previous => [...previous, product]);
+    setName("");
+    setCategory("General");
+    setQuantity("1");
+  }
+
+  function removeProduct(id: number) {
+    setProducts(previous => previous.filter(product => product.id !== id));
+  }
+
+  const filteredProducts = products.filter(product =>
+    `${product.name} ${product.category}`
+      .toLowerCase()
+      .includes(search.toLowerCase())
+  );
+
+  return (
+    <main>
+      <h1>Product Manager</h1>
+
+      <section>
+        <h2>Add Product</h2>
+
+        <label>
+          Name:
+          <input
+            value={name}
+            onChange={event => setName(event.target.value)}
+            placeholder="Product name"
+          />
+        </label>
+
+        <label>
+          Category:
+          <input
+            value={category}
+            onChange={event => setCategory(event.target.value)}
+          />
+        </label>
+
+        <label>
+          Quantity:
+          <input
+            type="number"
+            min="0"
+            step="1"
+            value={quantity}
+            onChange={event => setQuantity(event.target.value)}
+          />
+        </label>
+
+        <button onClick={addProduct}>Add Product</button>
+      </section>
+
+      <section>
+        <h2>Search Products</h2>
+        <input
+          value={search}
+          onChange={event => setSearch(event.target.value)}
+          placeholder="Search name or category"
+        />
+      </section>
+
+      <section>
+        <h2>Product List</h2>
+
+        {filteredProducts.length === 0 ? (
+          <p>No matching products found.</p>
+        ) : (
+          <table border={1} cellPadding={8}>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Quantity</th>
+                <th>Stock Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredProducts.map(product => (
+                <tr key={product.id}>
+                  <td>{product.id}</td>
+                  <td>{product.name}</td>
+                  <td>{product.category}</td>
+                  <td>{product.quantity}</td>
+                  <td>
+                    {product.quantity === 0
+                      ? "Out of stock"
+                      : product.quantity < 5
+                        ? "Low stock"
+                        : "In stock"}
+                  </td>
+                  <td>
+                    <button onClick={() => removeProduct(product.id)}>
+                      Remove
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+
+        <p>Total products: {products.length}</p>
+        <p>Matching products: {filteredProducts.length}</p>
+      </section>
+    </main>
+  );
+}
+
+Create or update App.tsx:
+
+import ProductManager from "./ProductManager";
+
+export default function App() {
+  return <ProductManager />;
+}
+
+This mini project stores products only in component state. Refreshing the
+browser resets the list. A production app would normally use an API/database.
+
+============================================================
+PART 9 — IMPORTANT LIST CONCEPTS
+============================================================
+
+1. map()
+------
+Transforms every array element into JSX.
+
+items.map(item => <li key={item.id}>{item.name}</li>)
+
+2. filter()
+-----------
+Returns a new array containing only matching elements.
+
+const available = products.filter(product => product.quantity > 0);
+
+3. find()
+--------
+Returns the first matching element, or undefined if there is no match.
+
+const product = products.find(item => item.id === selectedId);
+
+4. sort()
+---------
+Orders array elements, but mutates the array. Copy first if needed.
+
+const sorted = [...names].sort((a, b) => a.localeCompare(b));
+
+5. slice()
+----------
+Returns a selected portion of an array, often used for pagination.
+
+const visible = products.slice(0, 5);
+
+6. KEYS
+-------
+Use a stable ID:
+<li key={product.id}>{product.name}</li>
+
+Avoid using array indexes as keys when items may be added, removed, filtered,
+or reordered. Do not use Math.random() as a key during rendering. A key is used
+by React to identify siblings; it is not automatically passed as a normal prop.
+
+7. IMMUTABLE STATE UPDATES
+--------------------------
+Add:
+setItems(previous => [...previous, newItem]);
+
+Remove:
+setItems(previous => previous.filter(item => item.id !== id));
+
+Update:
+setItems(previous =>
+  previous.map(item =>
+    item.id === id ? { ...item, active: !item.active } : item
+  )
+);
+
+Do not call previous.push(newItem) or modify an object in state directly.
+
+============================================================
+PART 10 — COMMON MISTAKES
+============================================================
+
+MISTAKE 1: Calling a handler during render
+Wrong:   <button onClick={saveData()}>Save</button>
+Correct: <button onClick={saveData}>Save</button>
+
+MISTAKE 2: Passing an argument incorrectly
+Wrong:   <button onClick={removeProduct(product.id)}>Remove</button>
+Correct: <button onClick={() => removeProduct(product.id)}>Remove</button>
+
+MISTAKE 3: Missing list key
+Wrong:   products.map(product => <li>{product.name}</li>)
+Correct: products.map(product => <li key={product.id}>{product.name}</li>)
+
+MISTAKE 4: Mutating an array in state
+Wrong:
+products.push(newProduct);
+setProducts(products);
+
+Correct:
+setProducts(previous => [...previous, newProduct]);
+
+MISTAKE 5: Reading a checkbox's value instead of checked
+Usually correct:
+onChange={event => setAccepted(event.target.checked)}
+
+MISTAKE 6: Forgetting preventDefault on a custom form handler
+If you want to handle submission without browser navigation, call
+event.preventDefault() in the onSubmit handler.
+
+MISTAKE 7: Using an unstable list key
+Avoid key={Math.random()} and avoid indexes for changing/reorderable lists.
+Use a stable unique identifier.
+
+MISTAKE 8: Updating state based on an old value
+Prefer:
+setCount(previous => previous + 1)
+when the new value depends on the previous state.
+
+============================================================
+PART 11 — PRACTICE EXERCISES
+============================================================
+
+BEGINNER — EVENTS
+1. Display an alert after clicking a button.
+2. Build a counter with increment, decrement, and reset.
+3. Display text while the user types.
+4. Show the selected city from a dropdown.
+5. Enable a Continue button only when a checkbox is selected.
+6. Submit a form without reloading the page.
+7. Display the last key pressed.
+8. Change a message when the pointer enters or leaves a box.
+
+INTERMEDIATE — LISTS
+9. Display employees in a table.
+10. Show an empty-state message for an empty list.
+11. Filter products by category.
+12. Sort names alphabetically.
+13. Search products by name.
+14. Display only available products.
+15. Group employees by department.
+16. Display nested departments and employee lists.
+
+ADVANCED — EVENTS + LISTS
+17. Add a task to a list.
+18. Remove a task using its ID.
+19. Mark a task complete or incomplete.
+20. Create a shopping cart with add/remove buttons.
+21. Build a product manager with search and stock status.
+22. Add select-all and clear-all checkbox actions.
+23. Implement pagination.
+24. Create a reusable List component that receives data through props.
+25. Explain why stable keys matter.
+26. Demonstrate event bubbling and stopPropagation().
+27. Explain the difference between preventDefault() and stopPropagation().
+28. Validate a form before adding an item to a list.
+29. Add an edit operation to the Product Manager.
+30. Extend Product Manager to save products through a REST API.
+
+============================================================
+SUMMARY
+============================================================
+
+EVENT HANDLING
+- onClick: respond to clicks
+- onChange: respond to input changes
+- onSubmit: handle form submission
+- onKeyDown: respond to keyboard keys
+- onMouseEnter/onMouseLeave: pointer entry and exit
+- onFocus/onBlur: focus changes
+- preventDefault(): prevent the browser's default action
+- stopPropagation(): stop an event from bubbling to ancestors
+
+LISTS
+- map(): render each item
+- filter(): select matching items
+- find(): find one item
+- sort(): order a copied array
+- slice(): select a range
+- key: stable identity for list items
+- useState: hold interactive list data
+- spread/map/filter: update arrays immutably
+
+RECOMMENDED LEARNING ORDER
+1. Click events and function handlers
+2. useState with a counter
+3. Controlled inputs and onChange
+4. Forms and validation
+5. map() and stable keys
+6. filter(), search, and sort
+7. Add, remove, and update list items
+8. Combine everything in the Product Manager mini project
+
+END OF TUTORIAL

@@ -1,0 +1,179 @@
+/*
+  Palette B: Alabaster Grey / Powder Petal / Pastel Pink / Cherry Blossom / Dusty Mauve
+  Everything below uses the role variables, so to switch palettes only edit this block.
+
+  Palette A (previous), https://coolors.co/987284-75b9be-d0d6b5-f9b5ac-ee7674:
+    --main: #7a5668;  --main-hover: #664656;  --main-active: #583c4a;  --main-soft: #987284;
+    --accent: #75b9be;  --accent-hover: #5fa9ae;  --accent-active: #509a9f;
+    --danger: #ee7674;  --danger-hover: #e45f5d;  --danger-active: #d94f4d;
+    --header-bg: #d0d6b5;  --stripe: 249, 181, 172;  --hover: 117, 185, 190;
+    --page-bg: #fdf1ef;  --ink: #2d2230;
+*/
+:root {
+  /* Raw colours */
+  --alabaster-grey: #d8e2dc;
+  --powder-petal: #ffe5d9;
+  --pastel-pink: #ffcad4;
+  --cherry-blossom: #f4acb7;
+  --dusty-mauve: #9d8189;
+
+  /* Roles */
+  --main: #7d636b; /* darkened dusty mauve so white text stays readable */
+  --main-hover: #6a535a;
+  --main-active: #5a464c;
+  --main-soft: var(--dusty-mauve);
+  --accent: var(--alabaster-grey);
+  --accent-hover: #c5d4cb;
+  --accent-active: #b3c6ba;
+  --danger: var(--cherry-blossom);
+  --danger-hover: #ee94a3;
+  --danger-active: #e87d8f;
+  --header-bg: var(--alabaster-grey);
+  --stripe: 255, 202, 212; /* pastel pink, as r, g, b */
+  --hover: 216, 226, 220; /* alabaster grey, as r, g, b */
+  --page-bg: #fff4ee; /* lightened powder petal */
+  --ink: #3a2a30; /* dark text for use on the light palette colours */
+
+  color-scheme: light;
+  --bs-body-bg: var(--page-bg);
+  --bs-body-color: var(--ink);
+  --bs-link-color: var(--main);
+  --bs-link-hover-color: var(--ink);
+  --bs-border-color: rgba(157, 129, 137, 0.35);
+}
+
+/* Navbar */
+.navbar-themed {
+  background-color: var(--main);
+}
+.navbar-themed .nav-link {
+  color: rgba(255, 255, 255, 0.8);
+}
+.navbar-themed .nav-link:hover {
+  color: #fff;
+}
+.navbar-themed .nav-link.active {
+  color: #fff;
+  font-weight: 600;
+  box-shadow: inset 0 -3px 0 var(--cherry-blossom);
+}
+
+/* Headings */
+.page-title {
+  color: var(--main);
+}
+
+/* Cards */
+.card-themed {
+  background-color: #fff;
+  border-color: var(--bs-border-color);
+}
+
+/* Table */
+.table-themed {
+  --bs-table-striped-bg: rgba(var(--stripe), 0.28);
+  --bs-table-hover-bg: rgba(var(--hover), 0.6);
+}
+.table-themed thead th {
+  background-color: var(--header-bg);
+  color: var(--ink);
+  border-bottom-color: var(--main-soft);
+}
+
+/* Buttons (Bootstrap button variables, so hover/active/focus states work) */
+.btn-main {
+  --bs-btn-color: #fff;
+  --bs-btn-bg: var(--main);
+  --bs-btn-border-color: var(--main);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: var(--main-hover);
+  --bs-btn-hover-border-color: var(--main-hover);
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: var(--main-active);
+  --bs-btn-active-border-color: var(--main-active);
+  --bs-btn-disabled-color: #fff;
+  --bs-btn-disabled-bg: var(--main-soft);
+  --bs-btn-disabled-border-color: var(--main-soft);
+  --bs-btn-focus-shadow-rgb: 157, 129, 137;
+}
+.btn-accent {
+  --bs-btn-color: var(--ink);
+  --bs-btn-bg: var(--accent);
+  --bs-btn-border-color: var(--main-soft);
+  --bs-btn-hover-color: var(--ink);
+  --bs-btn-hover-bg: var(--accent-hover);
+  --bs-btn-hover-border-color: var(--main-soft);
+  --bs-btn-active-color: var(--ink);
+  --bs-btn-active-bg: var(--accent-active);
+  --bs-btn-active-border-color: var(--main-soft);
+  --bs-btn-focus-shadow-rgb: 157, 129, 137;
+}
+.btn-delete {
+  --bs-btn-color: var(--ink);
+  --bs-btn-bg: var(--danger);
+  --bs-btn-border-color: var(--danger);
+  --bs-btn-hover-color: var(--ink);
+  --bs-btn-hover-bg: var(--danger-hover);
+  --bs-btn-hover-border-color: var(--danger-hover);
+  --bs-btn-active-color: var(--ink);
+  --bs-btn-active-bg: var(--danger-active);
+  --bs-btn-active-border-color: var(--danger-active);
+  --bs-btn-focus-shadow-rgb: 244, 172, 183;
+}
+
+/* Form controls */
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--main-soft);
+  box-shadow: 0 0 0 0.25rem rgba(157, 129, 137, 0.25);
+}
+
+/* Hotel photos */
+.hotel-photo {
+  object-fit: cover;
+}
+.hotel-thumb {
+  width: 72px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 0.375rem;
+  display: block;
+}
+
+/* Login page: full-screen photo behind the form, tinted so text stays readable */
+.login-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(rgba(58, 42, 48, 0.45), rgba(58, 42, 48, 0.55)),
+    url("/login-bg.jpg") center / cover no-repeat;
+}
+.login-title {
+  color: #fff;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
+}
+.login-card {
+  background-color: rgba(255, 255, 255, 0.93);
+  backdrop-filter: blur(4px);
+}
+
+/* Alerts and badges */
+.alert-themed {
+  --bs-alert-bg: rgba(var(--stripe), 0.45);
+  --bs-alert-border-color: var(--pastel-pink);
+  --bs-alert-color: var(--ink);
+}
+.alert-error {
+  --bs-alert-bg: rgba(244, 172, 183, 0.35);
+  --bs-alert-border-color: var(--cherry-blossom);
+  --bs-alert-color: var(--ink);
+}
+.badge-rating {
+  background-color: var(--accent);
+  color: var(--ink);
+  border: 1px solid var(--main-soft);
+}
+.spinner-themed {
+  color: var(--main-soft);
+}

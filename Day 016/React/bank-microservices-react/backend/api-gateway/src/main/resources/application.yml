@@ -1,0 +1,47 @@
+server:
+  port: 8765
+spring:
+  application:
+    name: BANK-GATEWAY
+  cloud:
+    gateway:
+      server:
+        webflux:
+          globalcors:
+            add-to-simple-url-handler-mapping: true
+            cors-configurations:
+              '[/**]':
+                allowedOrigins:
+                  - "http://localhost:5173"
+                  - "http://127.0.0.1:5173"
+                allowedMethods:
+                  - GET
+                  - POST
+                  - PUT
+                  - PATCH
+                  - DELETE
+                  - OPTIONS
+                allowedHeaders:
+                  - "*"
+                allowCredentials: false
+          routes:
+            - id: account-service
+              uri: lb://ACCOUNTS
+              predicates:
+                - Path=/api/v1/accounts,/api/v1/accounts/**
+              filters:
+                - AuthenticationFilter
+            - id: customer-service
+              uri: lb://CUSTOMER
+              predicates:
+                - Path=/api/v1/customers,/api/v1/customers/**
+              filters:
+                - AuthenticationFilter
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    registry-fetch-interval-seconds: 5   # pick up new services quickly (default 30)
+security:
+  jwt:
+    secret: ${JWT_SECRET:local-demo-secret-change-this-before-production-123456789}

@@ -1,0 +1,22 @@
+server:
+  port: 9898
+spring:
+  application:
+    name: AUTH-SERVICE
+  datasource:
+    url: jdbc:h2:mem:authdb;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+security:
+  jwt:
+    secret: "local-demo-secret-change-this-before-production-123456789"
+    expiration-ms: 3600000

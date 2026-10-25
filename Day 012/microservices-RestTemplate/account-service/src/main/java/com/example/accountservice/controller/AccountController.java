@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,23 +36,27 @@ public class AccountController {
     }
 
     @PostMapping("/savings")
+    @PreAuthorize("@access.canAccess(authentication, #request.customerId())")
     @ResponseStatus(HttpStatus.CREATED)
     public SavingsAccountResponse openSavingsAccount(@Valid @RequestBody SavingsAccountRequest request) {
         return service.openSavingsAccount(request);
     }
 
     @GetMapping("/savings/{customerId}")
+    @PreAuthorize("@access.canAccess(authentication, #customerId)")
     public List<SavingsAccountResponse> getSavingsAccounts(@PathVariable Long customerId) {
         return service.getSavingsAccounts(customerId);
     }
 
     @PostMapping("/loans")
+    @PreAuthorize("@access.canAccess(authentication, #request.customerId())")
     @ResponseStatus(HttpStatus.CREATED)
     public LoanResponse createLoan(@Valid @RequestBody LoanRequest request) {
         return service.createLoan(request);
     }
 
     @GetMapping("/loans/{customerId}")
+    @PreAuthorize("@access.canAccess(authentication, #customerId)")
     public List<LoanResponse> getLoans(@PathVariable Long customerId) {
         return service.getLoans(customerId);
     }

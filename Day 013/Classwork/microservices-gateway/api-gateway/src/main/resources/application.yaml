@@ -8,6 +8,13 @@ spring:
     gateway:
       server:
         webflux:
+          globalcors:
+            cors-configurations:
+              '[/**]':
+                allowedOrigins:
+                  - ${CORS_ALLOWED_ORIGINS:http://localhost:5173}
+                allowedMethods: [GET, POST, PUT, DELETE, OPTIONS]
+                allowedHeaders: [Authorization, Content-Type]
           routes:
             - id: account-service
               uri: lb://ACCOUNT-SERVICE
@@ -17,7 +24,7 @@ spring:
             - id: customer-service
               uri: lb://CUSTOMER-SERVICE
               predicates:
-                - Path=/api/v1/customers,/api/v1/customers/**
+                - Path=/api/v1/customers,/api/v1/customers/**,/api/v1/auth/**
 
 eureka:
   client:

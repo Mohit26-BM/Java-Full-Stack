@@ -1,0 +1,96 @@
+services:
+  eureka-server:
+    build:
+      context: ./backend
+      args:
+        MODULE: eureka-server
+    image: bank-eureka-server
+    container_name: bank-eureka-server
+    ports:
+      - "8761:8761"
+    networks:
+      - bank-network
+
+  auth-service:
+    build:
+      context: ./backend
+      args:
+        MODULE: auth-service
+    image: bank-auth-service
+    container_name: bank-auth-service
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    ports:
+      - "9898:9898"
+    networks:
+      - bank-network
+    depends_on:
+      - eureka-server
+
+  customer-service:
+    build:
+      context: ./backend
+      args:
+        MODULE: customer-service
+    image: bank-customer-service
+    container_name: bank-customer-service
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    ports:
+      - "8081:8081"
+    networks:
+      - bank-network
+    depends_on:
+      - eureka-server
+
+  account-service:
+    build:
+      context: ./backend
+      args:
+        MODULE: account-service
+    image: bank-account-service
+    container_name: bank-account-service
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    ports:
+      - "8082:8082"
+    networks:
+      - bank-network
+    depends_on:
+      - eureka-server
+      - customer-service
+
+  api-gateway:
+    build:
+      context: ./backend
+      args:
+        MODULE: api-gateway
+    image: bank-api-gateway
+    container_name: bank-api-gateway
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    ports:
+      - "8765:8765"
+    networks:
+      - bank-network
+    depends_on:
+      - eureka-server
+      - auth-service
+      - customer-service
+      - account-service
+
+  frontend:
+    build:
+      context: ./frontend
+    image: bank-frontend
+    container_name: bank-frontend
+    ports:
+      - "5173:80"
+    networks:
+      - bank-network
+    depends_on:
+      - api-gateway
+
+networks:
+  bank-network:
+    driver: bridge

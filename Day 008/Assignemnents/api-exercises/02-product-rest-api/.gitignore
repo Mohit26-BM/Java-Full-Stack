@@ -1,0 +1,4 @@
+target/
+
+# Contains the MySQL password
+src/main/resources/db-secret.properties

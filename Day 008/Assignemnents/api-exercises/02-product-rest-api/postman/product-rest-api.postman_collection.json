@@ -1,0 +1,96 @@
+{
+  "info": {
+    "name": "Exercise 2 - Product REST API",
+    "description": "Run in order on a fresh database (schema.sql + sample-data.sql: 12 products, the new one gets id 13).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [{ "key": "baseUrl", "value": "http://localhost:8080" }],
+  "item": [
+    {
+      "name": "1. CRUD",
+      "item": [
+        {
+          "name": "POST create product (201)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/products",
+            "body": { "mode": "raw", "raw": "{\"name\":\"Webcam 1080p\",\"category\":\"Electronics\",\"price\":2499.00,\"quantity\":15,\"brand\":\"Logitech\"}" }
+          }
+        },
+        { "name": "GET product (200)", "request": { "method": "GET", "url": "{{baseUrl}}/api/products/13" } },
+        {
+          "name": "PUT update product, version 0 (200)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/products/13",
+            "body": { "mode": "raw", "raw": "{\"name\":\"Webcam 4K\",\"category\":\"Electronics\",\"price\":4999.00,\"quantity\":10,\"brand\":\"Logitech\",\"active\":true,\"version\":0}" }
+          }
+        },
+        {
+          "name": "PATCH quantity (200)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/products/13/quantity",
+            "body": { "mode": "raw", "raw": "{\"quantity\":7}" }
+          }
+        },
+        { "name": "DELETE product (204)", "request": { "method": "DELETE", "url": "{{baseUrl}}/api/products/13" } },
+        { "name": "GET deleted product (404)", "request": { "method": "GET", "url": "{{baseUrl}}/api/products/13" } }
+      ]
+    },
+    {
+      "name": "2. Filtering, pagination, sorting",
+      "item": [
+        { "name": "Defaults", "request": { "method": "GET", "url": "{{baseUrl}}/api/products" } },
+        { "name": "By category", "request": { "method": "GET", "url": "{{baseUrl}}/api/products?category=electronics" } },
+        { "name": "By price range", "request": { "method": "GET", "url": "{{baseUrl}}/api/products?minPrice=1000&maxPrice=5000" } },
+        { "name": "Category + price, sort by price desc", "request": { "method": "GET", "url": "{{baseUrl}}/api/products?category=Electronics&minPrice=1000&maxPrice=10000&sortBy=price&direction=desc" } },
+        { "name": "Page 1, size 5, sort by name", "request": { "method": "GET", "url": "{{baseUrl}}/api/products?page=1&size=5&sortBy=name&direction=asc" } },
+        { "name": "Search by name", "request": { "method": "GET", "url": "{{baseUrl}}/api/products?name=shoe" } }
+      ]
+    },
+    {
+      "name": "3. Validation and errors",
+      "item": [
+        {
+          "name": "Invalid product (400)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/products",
+            "body": { "mode": "raw", "raw": "{\"name\":\"A\",\"category\":\"\",\"price\":0,\"quantity\":-3}" }
+          }
+        },
+        { "name": "Unknown id (404)", "request": { "method": "GET", "url": "{{baseUrl}}/api/products/999" } },
+        { "name": "Invalid sortBy (400)", "request": { "method": "GET", "url": "{{baseUrl}}/api/products?sortBy=colour" } },
+        { "name": "minPrice > maxPrice (400)", "request": { "method": "GET", "url": "{{baseUrl}}/api/products?minPrice=5000&maxPrice=1000" } }
+      ]
+    },
+    {
+      "name": "4. Optimistic locking",
+      "item": [
+        {
+          "name": "User A updates product 2 with version 0 (200)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/products/2",
+            "body": { "mode": "raw", "raw": "{\"name\":\"Mechanical Keyboard\",\"category\":\"Electronics\",\"price\":3299.00,\"quantity\":20,\"brand\":\"Keychron\",\"active\":true,\"version\":0}" }
+          }
+        },
+        {
+          "name": "User B updates product 2 with stale version 0 (409)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/products/2",
+            "body": { "mode": "raw", "raw": "{\"name\":\"Mechanical Keyboard\",\"category\":\"Electronics\",\"price\":3999.00,\"quantity\":20,\"brand\":\"Keychron\",\"active\":true,\"version\":0}" }
+          }
+        }
+      ]
+    }
+  ]
+}
