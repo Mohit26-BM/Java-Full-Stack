@@ -15,4 +15,9 @@ public class HelloController {
     public String welcome() {
         return "Welcome to my KubernetesDemoApp!";
     }
+
+    @GetMapping("/bye")
+    public String bye() {
+        return "This is bye from my Kubernetes demo app!";
+    }
 }

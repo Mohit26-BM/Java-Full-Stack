@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: restdemo
-          image: restdemo:1.0
+          image: restdemo:2.0
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8081
