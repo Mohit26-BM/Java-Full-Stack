@@ -127,3 +127,35 @@ dist-ssr/
 db.properties
 db-secret.properties
 secrets.properties
+
+# ==============================
+# Heavy binaries, installers and archives
+# (e.g. gitlab-runner-windows-amd64.exe is ~137 MB)
+# ==============================
+*.exe
+*.msi
+*.dll
+*.zip
+*.rar
+*.7z
+*.tar
+*.gz
+*.tgz
+*.iso
+*.dmg
+*.bin
+
+# Local databases (H2 / SQLite) and Docker image exports
+*.mv.db
+*.trace.db
+*.sqlite
+*.sqlite3
+*.db
+
+# Build caches
+.metals/
+.bloop/
+.gradle/
+.next/
+.vite/
+*.tsbuildinfo
