@@ -1,0 +1,43 @@
+services:
+  eureka-server:
+    build: ./eureka-server
+    image: microservices-demo/eureka-server:1.0.0
+    ports:
+      - "8761:8761"
+
+  product-service-1:
+    build: ./product-service
+    image: microservices-demo/product-service:1.0.0
+    environment:
+      EUREKA_URL: http://eureka-server:8761/eureka/
+      INSTANCE_NAME: product-service-1
+    depends_on:
+      - eureka-server
+
+  product-service-2:
+    image: microservices-demo/product-service:1.0.0
+    environment:
+      EUREKA_URL: http://eureka-server:8761/eureka/
+      INSTANCE_NAME: product-service-2
+    depends_on:
+      - product-service-1
+
+  order-service:
+    build: ./order-service
+    image: microservices-demo/order-service:1.0.0
+    environment:
+      EUREKA_URL: http://eureka-server:8761/eureka/
+    ports:
+      - "127.0.0.1:18081:8081"
+    depends_on:
+      - eureka-server
+
+  api-gateway:
+    build: ./api-gateway
+    image: microservices-demo/api-gateway:1.0.0
+    environment:
+      EUREKA_URL: http://eureka-server:8761/eureka/
+    ports:
+      - "8080:8080"
+    depends_on:
+      - eureka-server

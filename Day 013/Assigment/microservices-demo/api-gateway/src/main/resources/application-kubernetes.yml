@@ -1,0 +1,20 @@
+eureka:
+  client:
+    enabled: false
+
+spring:
+  cloud:
+    discovery:
+      client:
+        simple:
+          instances:
+            product-service:
+              - uri: http://product-service:8082
+            order-service:
+              - uri: http://order-service:8081
+    gateway:
+      server:
+        webflux:
+          httpclient:
+            pool:
+              type: DISABLED

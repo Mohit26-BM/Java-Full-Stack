@@ -1,0 +1,100 @@
+KUBERNETES DEPLOYMENT - BANK MICROSERVICES (Docker Desktop + Kompose)
+Run in Windows PowerShell. Docker Desktop must be running with Kubernetes enabled.
+Images must already exist: bank-eureka-server, bank-auth-service, bank-customer-service,
+bank-account-service, bank-api-gateway, bank-frontend (check with: docker images)
+
+
+---------------------------------------------------------------
+STEP 1: Select the cluster
+---------------------------------------------------------------
+kubectl config use-context docker-desktop
+kubectl get nodes
+
+
+---------------------------------------------------------------
+STEP 2: Install Kompose (one time, run PowerShell as Administrator)
+---------------------------------------------------------------
+choco install kubernetes-kompose -y
+kompose version
+
+
+---------------------------------------------------------------
+STEP 3: Convert the compose file to Kubernetes YAML
+---------------------------------------------------------------
+cd "D:\CSB_Training\Day 016\React\bank-microservices-react"
+mkdir k8s
+kompose convert -f docker-compose.yml -o k8s/
+
+
+---------------------------------------------------------------
+STEP 4: Add imagePullPolicy to every deployment
+(needed because the images are local only; without it you get ErrImagePull)
+---------------------------------------------------------------
+Get-ChildItem k8s\*-deployment.yaml | ForEach-Object {
+  $c = Get-Content $_.FullName -Raw
+  $c = $c -replace '(?m)^(\s*)- image: (bank-\S+)\s*$', "`$1- image: `$2`n`$1  imagePullPolicy: IfNotPresent"
+  $c = $c -replace '(?m)^(\s+)image: (bank-\S+)\s*$', "`$1image: `$2`n`$1imagePullPolicy: IfNotPresent"
+  Set-Content $_.FullName $c -Encoding utf8
+}
+Select-String -Path k8s\*-deployment.yaml -Pattern "imagePullPolicy"
+
+(Expect 6 matching lines, one per deployment.)
+
+
+---------------------------------------------------------------
+STEP 5: Deploy
+---------------------------------------------------------------
+kubectl apply -f k8s/
+
+
+---------------------------------------------------------------
+STEP 6: Verify (wait about a minute until all pods show 1/1 Running)
+---------------------------------------------------------------
+kubectl get deployments
+kubectl get pods
+kubectl get services
+
+
+---------------------------------------------------------------
+STEP 7: Access the application
+Open FOUR separate PowerShell windows. Run ONE command in each.
+Each command keeps its window busy; press Ctrl+C to stop it.
+---------------------------------------------------------------
+Window 1:  kubectl port-forward service/eureka-server 8761:8761
+Window 2:  kubectl port-forward service/api-gateway 8765:8765
+Window 3:  kubectl port-forward service/auth-service 9898:9898
+Window 4:  kubectl port-forward service/frontend 5173:5173
+
+Open in the browser:
+  http://localhost:5173    (login: demo / Demo@123)
+  http://localhost:8761    (Eureka: ACCOUNTS, CUSTOMER, AUTH-SERVICE, BANK-GATEWAY)
+
+
+---------------------------------------------------------------
+USEFUL EXTRA COMMANDS
+---------------------------------------------------------------
+kubectl get pods -o wide                          # which node each pod runs on
+kubectl logs deployment/api-gateway               # view a service's logs
+kubectl describe pod <pod-name>                   # why a pod is not starting
+kubectl rollout restart deployment account-service customer-service auth-service api-gateway
+                                                  # restart if services are missing in Eureka
+kubectl scale deployment account-service --replicas=2   # run 2 copies
+
+
+---------------------------------------------------------------
+CLEAN UP
+---------------------------------------------------------------
+kubectl delete -f k8s/
+Press Ctrl+C in each port-forward window.
+(To start over from the beginning: also delete the k8s folder, then repeat from STEP 3.)
+
+
+---------------------------------------------------------------
+TROUBLESHOOTING
+---------------------------------------------------------------
+ErrImagePull / ImagePullBackOff   -> imagePullPolicy is missing in that deployment file (STEP 4),
+                                     or the image does not exist (docker images).
+"could not find expected ':'"     -> a deployment YAML is broken. Delete the k8s folder and
+                                     repeat STEP 3 and STEP 4.
+Port already in use               -> an old port-forward is still running; press Ctrl+C in its window.
+Login fails in the browser        -> the auth-service port-forward (9898) is not running.
