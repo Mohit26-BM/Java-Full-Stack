@@ -1,0 +1,166 @@
+:root {
+  --color-bg: #f5f6f8;
+  --color-surface: #ffffff;
+  --color-text: #1f2430;
+  --color-muted: #5b6475;
+  --color-accent: #2f5bd3;
+  --color-border: #dde1e8;
+  --color-success: #1d7a46;
+  --color-danger: #b42323;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color: var(--color-text);
+  background: var(--color-bg);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+.app-header {
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  padding: 0.9rem 1.25rem;
+}
+
+.app-title {
+  color: var(--color-text);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.app-main {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 3rem;
+}
+
+.page-title {
+  margin: 0 0 1rem;
+  font-size: 1.6rem;
+}
+
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 1rem 1.1rem;
+}
+
+.button {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-surface);
+  font: inherit;
+  cursor: pointer;
+}
+
+.button--primary {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+}
+
+.button--danger {
+  color: var(--color-danger);
+}
+
+.button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.field {
+  display: grid;
+  gap: 0.3rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.input {
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font: inherit;
+  font-weight: 400;
+  background: #fff;
+}
+
+.input--invalid {
+  border-color: var(--color-danger);
+}
+
+.error {
+  margin: 0;
+  color: var(--color-danger);
+  font-size: 0.85rem;
+  font-weight: 400;
+}
+
+.muted {
+  color: var(--color-muted);
+}
+
+.employee-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.75rem;
+}
+
+.employee-list__link {
+  display: grid;
+  gap: 0.2rem;
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.employee-list__link:hover {
+  border-color: var(--color-accent);
+}
+
+.details,
+.edit-form,
+.not-found {
+  max-width: 520px;
+}
+
+.edit-form {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.details__list {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.4rem 1.25rem;
+  margin: 0 0 1rem;
+}
+
+.details__list dt {
+  color: var(--color-muted);
+}
+
+.details__list dd {
+  margin: 0;
+}
+
+.details__actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.details__actions .button {
+  text-decoration: none;
+  color: inherit;
+}
+
+.details__actions .button--primary {
+  color: #fff;
+}

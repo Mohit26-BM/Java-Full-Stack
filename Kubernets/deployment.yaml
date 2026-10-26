@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: restdemo-deployment
+  namespace: k8sdemo
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: restdemo
+  template:
+    metadata:
+      labels:
+        app: restdemo
+    spec:
+      containers:
+        - name: restdemo
+          image: restdemo:1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8081

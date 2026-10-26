@@ -1,0 +1,88 @@
+.progress {
+  max-width: 620px;
+  margin-bottom: 1rem;
+}
+
+.progress__label {
+  margin: 0 0 0.4rem;
+}
+
+.progress__bar {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--color-border);
+  overflow: hidden;
+}
+
+.progress__fill {
+  height: 100%;
+  background: var(--color-accent);
+  transition: width 0.2s;
+}
+
+.loan {
+  max-width: 620px;
+}
+
+.loan__fields {
+  display: grid;
+  gap: 0.85rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.loan__legend {
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.loan__nav {
+  justify-content: space-between;
+  margin-top: 1.25rem;
+}
+
+.loan__restart {
+  margin-top: 0.75rem;
+}
+
+.review {
+  display: grid;
+  gap: 1rem;
+}
+
+.review__section {
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.review__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.review__title {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.review__list {
+  display: grid;
+  gap: 0.3rem;
+  margin: 0.5rem 0 0;
+}
+
+.review__row {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+}
+
+.review__row dt {
+  color: var(--color-muted);
+}
+
+.review__row dd {
+  margin: 0;
+}

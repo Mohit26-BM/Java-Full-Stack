@@ -1,0 +1,52 @@
+.bank {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.bank__group {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0.75rem 1rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}
+
+.bank__group legend {
+  padding: 0 0.3rem;
+  font-weight: 700;
+}
+
+.bank__nominee {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 0.6rem;
+  align-items: end;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px dashed var(--color-border);
+}
+
+.bank__remove {
+  align-self: end;
+}
+
+.bank__summary {
+  position: sticky;
+  top: 1rem;
+}
+
+.bank__summary .bank__summary-title {
+  margin-top: 0;
+}
+
+.bank__json {
+  margin: 0;
+  padding: 0.75rem;
+  overflow-x: auto;
+  border-radius: 6px;
+  background: #1f2430;
+  color: #e6e9ef;
+  font-size: 0.85rem;
+}

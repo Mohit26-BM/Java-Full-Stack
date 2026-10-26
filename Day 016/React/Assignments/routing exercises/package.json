@@ -1,0 +1,13 @@
+{
+  "name": "routing-forms-state",
+  "private": true,
+  "workspaces": [
+    "[0-9]*"
+  ],
+  "scripts": {
+    "dev:all": "concurrently -n 01,02,03,04,05-12,13,14,15 -c auto \"npm run dev -w 01-portal-navigation\" \"npm run dev -w 02-employee-details\" \"npm run dev -w 03-department-dashboard\" \"npm run dev -w 04-protected-admin\" \"npm run dev -w 05-12-forms-and-state\" \"npm run dev -w 13-employee-spa\" \"npm run dev -w 14-banking-portal\" \"npm run dev -w 15-training-portal\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

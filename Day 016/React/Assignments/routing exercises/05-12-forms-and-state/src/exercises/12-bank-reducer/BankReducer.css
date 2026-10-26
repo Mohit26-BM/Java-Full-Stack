@@ -1,0 +1,33 @@
+.balances {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.balances__item p {
+  margin: 0;
+}
+
+.balances__value {
+  font-size: 1.7rem;
+  font-weight: 700;
+}
+
+.tx-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.75rem;
+  align-items: end;
+}
+
+.tx-form__actions {
+  align-self: end;
+}
+
+.bank-error {
+  margin-top: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  background: #fbe5e5;
+}
