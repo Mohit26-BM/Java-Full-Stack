@@ -1,0 +1,44 @@
+pipeline {
+    agent any
+
+    tools {
+        maven 'maven3'
+        jdk 'JDK17'
+    }
+
+    environment {
+        PATH = "C:\\Users\\mbmoh\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin;${env.PATH}"
+    }
+
+    stages {
+        stage('checkout') {
+            steps {
+                echo 'checkout the code from github'
+                checkout scm
+                echo '===== checkout finished ====='
+            }
+        }
+        stage('build') {
+            steps {
+                echo 'create a jar file from the code'
+                bat 'mvn clean install'
+                echo '===== build finished, jar created ====='
+            }
+        }
+        stage('docker-image') {
+            steps {
+                echo 'create a docker image'
+                bat 'docker build -t ci-cd-pipeline-image .'
+                echo '===== docker image built ====='
+            }
+        }
+        stage('deploy') {
+            steps {
+                echo 'create a container to run the image'
+                bat 'docker rm -f ci-cd-pipeline-demo >nul 2>&1 & exit /b 0'
+                bat 'docker run -dit --name ci-cd-pipeline-demo -p 9091:8080 ci-cd-pipeline-image'
+                echo '===== container started on http://localhost:9091 ====='
+            }
+        }
+    }
+}
