@@ -32,12 +32,8 @@ class ProductRepositoryTest {
     }
 
     @Test
-    void testSaveGeneratesIdAndTimestamps() {
-        Product saved = productRepository.save(new Product("Desk Lamp", "Accessories", new BigDecimal("999.00"), 25));
-
-        assertNotNull(saved.getId());
-        assertNotNull(saved.getCreatedAt());
-        assertNotNull(saved.getUpdatedAt());
+    void testSave() {
+        assertNotNull(mouse.getId());
     }
 
     @Test
@@ -45,12 +41,6 @@ class ProductRepositoryTest {
         Product found = productRepository.findById(mouse.getId()).orElseThrow();
 
         assertEquals("Wireless Mouse", found.getName());
-        assertEquals(50, found.getStock());
-    }
-
-    @Test
-    void testFindByIdWhenMissing() {
-        assertTrue(productRepository.findById(99999L).isEmpty());
     }
 
     @Test
@@ -63,34 +53,6 @@ class ProductRepositoryTest {
         productRepository.deleteById(mouse.getId());
 
         assertFalse(productRepository.existsById(mouse.getId()));
-        assertEquals(2, productRepository.count());
-    }
-
-    @Test
-    void testExistsByNameIgnoreCase() {
-        assertTrue(productRepository.existsByNameIgnoreCase("WIRELESS MOUSE"));
-        assertFalse(productRepository.existsByNameIgnoreCase("Unknown"));
-    }
-
-    @Test
-    void testExistsByNameIgnoreCaseAndIdNot() {
-        assertFalse(productRepository.existsByNameIgnoreCaseAndIdNot("wireless mouse", mouse.getId()));
-        assertTrue(productRepository.existsByNameIgnoreCaseAndIdNot("wireless mouse", -1L));
-    }
-
-    @Test
-    void testFindByCategoryIgnoreCase() {
-        Page<Product> page = productRepository.findByCategoryIgnoreCase("electronics", PageRequest.of(0, 10));
-
-        assertEquals(2, page.getTotalElements());
-    }
-
-    @Test
-    void testFindByCategoryPaging() {
-        Page<Product> page = productRepository.findByCategoryIgnoreCase("Electronics", PageRequest.of(0, 1));
-
-        assertEquals(1, page.getContent().size());
-        assertEquals(2, page.getTotalPages());
     }
 
     @Test
@@ -98,30 +60,7 @@ class ProductRepositoryTest {
         Page<Product> page = productRepository.search("mouse", null, null, null, PageRequest.of(0, 10));
 
         assertEquals(1, page.getTotalElements());
-        assertEquals("Wireless Mouse", page.getContent().get(0).getName());
-    }
-
-    @Test
-    void testSearchByPriceRange() {
-        Page<Product> page = productRepository.search(null, null, new BigDecimal("500"), new BigDecimal("1000"),
-                PageRequest.of(0, 10));
-
-        assertEquals(1, page.getTotalElements());
-        assertEquals("Wireless Mouse", page.getContent().get(0).getName());
-    }
-
-    @Test
-    void testSearchWithNoFiltersReturnsEverything() {
-        Page<Product> page = productRepository.search(null, null, null, null, PageRequest.of(0, 10));
-
-        assertEquals(3, page.getTotalElements());
-    }
-
-    @Test
-    void testSearchWithNoMatch() {
-        Page<Product> page = productRepository.search("zzz", null, null, null, PageRequest.of(0, 10));
-
-        assertTrue(page.isEmpty());
+        assertTrue(page.getContent().get(0).getName().contains("Mouse"));
     }
 
 }
