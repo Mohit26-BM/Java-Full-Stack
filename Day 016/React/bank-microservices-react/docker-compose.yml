@@ -1,3 +1,13 @@
+# Secrets come from a git-ignored .env file next to this file (copy .env.example). MySQL runs on the host PC.
+# Only the gateway, auth service, Eureka dashboard and frontend are published; customer and account services are
+# reachable only inside bank-network (they are no longer exposed on 8083 / 8082).
+x-db: &db
+  DB_URL: jdbc:mysql://host.docker.internal:3306/Bank_Microservices?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+  DB_USERNAME: ${DB_USERNAME:-bank_app}
+  DB_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+  JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
+  SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-}
+
 services:
   eureka-server:
     build:
@@ -19,6 +29,7 @@ services:
     image: bank-auth-service
     container_name: bank-auth-service
     environment:
+      <<: *db
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
     ports:
       - "9898:9898"
@@ -35,9 +46,8 @@ services:
     image: bank-customer-service
     container_name: bank-customer-service
     environment:
+      <<: *db
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
-    ports:
-      - "8081:8081"
     networks:
       - bank-network
     depends_on:
@@ -51,9 +61,8 @@ services:
     image: bank-account-service
     container_name: bank-account-service
     environment:
+      <<: *db
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
-    ports:
-      - "8082:8082"
     networks:
       - bank-network
     depends_on:
@@ -68,6 +77,7 @@ services:
     image: bank-api-gateway
     container_name: bank-api-gateway
     environment:
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
     ports:
       - "8765:8765"

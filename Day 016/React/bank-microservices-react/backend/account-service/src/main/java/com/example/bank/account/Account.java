@@ -5,10 +5,16 @@ import java.time.LocalDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
+
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = "accounts")
@@ -29,6 +35,16 @@ public class Account {
 
     @Column(nullable = false, precision = 15, scale = 2)
     private BigDecimal balance;
+
+    @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.VARCHAR)
+    @Column(nullable = false, length = 10)
+    private AccountStatus status = AccountStatus.ACTIVE;
+
+    /** Optimistic lock: a second, conflicting update of the same row fails instead of overwriting the first. */
+    @Version
+    @Column(nullable = false)
+    private Long version;
 
     protected Account() {
     }
@@ -58,5 +74,21 @@ public class Account {
 
     public BigDecimal getBalance() {
         return balance;
+    }
+
+    public void setBalance(BigDecimal balance) {
+        this.balance = balance;
+    }
+
+    public AccountStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(AccountStatus status) {
+        this.status = status;
+    }
+
+    public AccountType type() {
+        return AccountType.valueOf(accountType);
     }
 }

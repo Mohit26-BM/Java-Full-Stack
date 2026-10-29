@@ -42,6 +42,23 @@ Select-String -Path k8s\*-deployment.yaml -Pattern "imagePullPolicy"
 
 
 ---------------------------------------------------------------
+STEP 4b: Create the Secret (once; the pods read the database password and JWT secret from it)
+---------------------------------------------------------------
+The k8s/ files in this folder have ALREADY been edited to read DB_PASSWORD and JWT_SECRET
+from a Secret called bank-secrets, and to use port 8083 for the customer service.
+Do NOT re-run "kompose convert" over them: it would drop those edits (and could copy values
+from your .env file into the YAML). Only convert again in a new folder, then copy the edits.
+
+kubectl create secret generic bank-secrets --from-literal=DB_PASSWORD='<password of the bank_app MySQL user>' --from-literal=JWT_SECRET='<random text, 32+ characters>'
+
+Use the same JWT_SECRET as in backend\secrets.properties and .env if tokens must work across setups.
+Check it exists:  kubectl get secret bank-secrets
+The pods reach MySQL on your PC at host.docker.internal:3306 as the dedicated user bank_app (set DB_PASSWORD in
+the Secret to that user's password). The user must be allowed from other hosts: create it for '%' as well as
+'localhost' (see Installation and Setup in the README). This path has not been run yet.
+
+
+---------------------------------------------------------------
 STEP 5: Deploy
 ---------------------------------------------------------------
 kubectl apply -f k8s/

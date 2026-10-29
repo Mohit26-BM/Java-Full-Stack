@@ -1,4 +1,4 @@
-﻿apiVersion: apps/v1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
@@ -24,8 +24,26 @@ spec:
         - env:
             - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
               value: http://eureka-server:8761/eureka/
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: bank-secrets
+                  key: JWT_SECRET
           image: bank-api-gateway
           imagePullPolicy: IfNotPresent
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8765
+            initialDelaySeconds: 40
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8765
+            initialDelaySeconds: 90
+            periodSeconds: 20
+            failureThreshold: 6
           name: bank-api-gateway
           ports:
             - containerPort: 8765

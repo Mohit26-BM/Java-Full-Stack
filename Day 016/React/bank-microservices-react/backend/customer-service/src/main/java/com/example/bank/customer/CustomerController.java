@@ -15,8 +15,13 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
+/**
+ * Who may do what: tellers and admins work with any customer; a customer login can read only the record it is
+ * linked to; nobody else gets anything (a token without a role is refused).
+ */
 @RestController
 @RequestMapping("/api/v1/customers")
 public class CustomerController {
@@ -31,13 +36,20 @@ public class CustomerController {
 
     @GetMapping
     @Transactional(readOnly = true)
-    public List<CustomerResponse> list() {
+    public List<CustomerResponse> list(HttpServletRequest request) {
+        if (!Caller.from(request).isStaff()) {
+            throw forbidden("Only bank staff can list all customers");
+        }
         return customers.findAll().stream().map(CustomerResponse::from).collect(Collectors.toList());
     }
 
     @GetMapping("/{customerId}")
     @Transactional(readOnly = true)
-    public CustomerResponse get(@PathVariable Long customerId) {
+    public CustomerResponse get(@PathVariable Long customerId, HttpServletRequest request) {
+        Caller caller = Caller.from(request);
+        if (!caller.isStaff() && !caller.owns(customerId)) {
+            throw forbidden("You can only view your own customer record");
+        }
         return customers.findById(customerId).map(CustomerResponse::from)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Customer " + customerId + " does not exist"));
@@ -46,7 +58,10 @@ public class CustomerController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Transactional
-    public CustomerResponse create(@Valid @RequestBody CustomerRequest request) {
+    public CustomerResponse create(@Valid @RequestBody CustomerRequest request, HttpServletRequest http) {
+        if (!Caller.from(http).isStaff()) {
+            throw forbidden("Only bank staff can register customers");
+        }
         if (request.dateOfBirth().isAfter(LocalDate.now().minusYears(MINIMUM_AGE))) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Customer must be at least " + MINIMUM_AGE + " years old");
@@ -58,5 +73,9 @@ public class CustomerController {
         Customer saved = customers.save(new Customer(request.name().trim(), email, request.dateOfBirth(),
                 request.gender(), request.city().trim()));
         return CustomerResponse.from(saved);
+    }
+
+    private ResponseStatusException forbidden(String message) {
+        return new ResponseStatusException(HttpStatus.FORBIDDEN, message);
     }
 }

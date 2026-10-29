@@ -4,10 +4,10 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public record AccountResponse(Long accountno, Long customerId, String accountType, LocalDate openingDate,
-                              BigDecimal balance) {
+                              BigDecimal balance, String status) {
 
     static AccountResponse from(Account a) {
         return new AccountResponse(a.getAccountno(), a.getCustomerId(), a.getAccountType(), a.getOpeningDate(),
-                a.getBalance());
+                a.getBalance(), a.getStatus().name());
     }
 }

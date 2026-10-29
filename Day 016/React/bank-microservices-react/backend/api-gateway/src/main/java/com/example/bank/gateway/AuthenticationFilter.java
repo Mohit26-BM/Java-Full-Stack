@@ -15,7 +15,9 @@ import reactor.core.publisher.Mono;
 @Component
 public class AuthenticationFilter extends AbstractGatewayFilterFactory<AuthenticationFilter.Config> {
  private final SecretKey key;
- public AuthenticationFilter(@Value("${security.jwt.secret}") String secret){super(Config.class);key=Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));}
+ public AuthenticationFilter(@Value("${security.jwt.secret:}") String secret){super(Config.class);
+  if(secret==null||secret.getBytes(StandardCharsets.UTF_8).length<32) throw new IllegalStateException("security.jwt.secret (JWT_SECRET) must be set and at least 32 characters long");
+  key=Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));}
  public static class Config{}
  @Override public GatewayFilter apply(Config config){return (exchange,chain)->{
   if(exchange.getRequest().getMethod()==HttpMethod.OPTIONS)return chain.filter(exchange);

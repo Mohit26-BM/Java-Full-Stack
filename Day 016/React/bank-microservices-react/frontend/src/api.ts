@@ -19,3 +19,6 @@ export function err(e:unknown){
  }
  return e instanceof Error?e.message:"Unexpected error";
 }
+
+/** The role claim inside a token (display only: the services check the token themselves, this just hides buttons that would fail). */
+export function roleOf(token:string):string{try{const p=token.split(".")[1].replace(/-/g,"+").replace(/_/g,"/");return JSON.parse(atob(p)).role??"";}catch{return"";}}

@@ -3,6 +3,8 @@ server:
 spring:
   application:
     name: BANK-GATEWAY
+  config:
+    import: optional:file:../secrets.properties
   cloud:
     gateway:
       server:
@@ -44,4 +46,13 @@ eureka:
     registry-fetch-interval-seconds: 5   # pick up new services quickly (default 30)
 security:
   jwt:
-    secret: ${JWT_SECRET:local-demo-secret-change-this-before-production-123456789}
+    secret: ${JWT_SECRET:}      # required, at least 32 characters; must match the other services
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      probes:
+        enabled: true

@@ -1,4 +1,4 @@
-﻿apiVersion: apps/v1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
@@ -23,6 +23,17 @@ spec:
       containers:
         - image: bank-eureka-server
           imagePullPolicy: IfNotPresent
+          readinessProbe:
+            tcpSocket:
+              port: 8761
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 8761
+            initialDelaySeconds: 60
+            periodSeconds: 20
+            failureThreshold: 6
           name: bank-eureka-server
           ports:
             - containerPort: 8761

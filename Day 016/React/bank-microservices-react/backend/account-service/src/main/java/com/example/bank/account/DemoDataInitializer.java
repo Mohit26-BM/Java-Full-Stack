@@ -7,9 +7,11 @@ import java.util.List;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
-/** The database is in memory, so these sample accounts (for the sample customers 1 to 3) return on every start. */
+/** Sample accounts for customers 1 to 3, inserted only when the "dev" profile is active and the table is empty. */
 @Configuration
+@Profile("dev")
 public class DemoDataInitializer {
 
     @Bean

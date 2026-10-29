@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +34,12 @@ public class ApiExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     ResponseEntity<Map<String, Object>> unreadable(HttpMessageNotReadableException ex) {
         return body(HttpStatus.BAD_REQUEST, "Request body is missing or not valid JSON");
+    }
+
+    /** Two requests changed the same account at once and this one lost; the client can simply retry. */
+    @ExceptionHandler(OptimisticLockingFailureException.class)
+    ResponseEntity<Map<String, Object>> concurrentUpdate(OptimisticLockingFailureException ex) {
+        return body(HttpStatus.CONFLICT, "The account was changed by another request at the same time. Please retry");
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)

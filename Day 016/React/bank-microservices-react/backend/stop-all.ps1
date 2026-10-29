@@ -1,7 +1,7 @@
 # Stops every backend service started by start-all.ps1.
 # The services are found by the ports they listen on, because Maven starts each one as a separate Java process
 # whose command line does not mention this project.
-$ports = 8761, 9898, 8081, 8082, 8765   # eureka, auth, customer, account, gateway
+$ports = 8761, 9898, 8083, 8082, 8765   # eureka, auth, customer, account, gateway
 $project = Split-Path -Parent $PSScriptRoot
 
 $ids = @()

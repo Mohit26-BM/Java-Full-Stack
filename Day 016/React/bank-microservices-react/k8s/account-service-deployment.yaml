@@ -1,4 +1,4 @@
-﻿apiVersion: apps/v1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
@@ -24,8 +24,35 @@ spec:
         - env:
             - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
               value: http://eureka-server:8761/eureka/
+            - name: DB_URL
+              value: jdbc:mysql://host.docker.internal:3306/Bank_Microservices?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+            - name: DB_USERNAME
+              value: bank_app
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: bank-secrets
+                  key: DB_PASSWORD
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: bank-secrets
+                  key: JWT_SECRET
           image: bank-account-service
           imagePullPolicy: IfNotPresent
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8082
+            initialDelaySeconds: 40
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8082
+            initialDelaySeconds: 90
+            periodSeconds: 20
+            failureThreshold: 6
           name: bank-account-service
           ports:
             - containerPort: 8082

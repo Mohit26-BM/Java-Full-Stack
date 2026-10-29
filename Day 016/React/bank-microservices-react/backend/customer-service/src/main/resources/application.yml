@@ -1,16 +1,21 @@
 server:
-  port: 8081
+  port: 8083            # was 8081, which clashes with Jenkins
 spring:
   application:
     name: CUSTOMER          # the gateway route uses lb://CUSTOMER
+  config:
+    import: optional:file:../secrets.properties
   datasource:
-    url: jdbc:h2:mem:customerdb;DB_CLOSE_DELAY=-1
-    username: sa
-    password:
-    driver-class-name: org.h2.Driver
+    url: ${DB_URL:jdbc:mysql://localhost:3306/Bank_Microservices?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+    username: ${DB_USERNAME:bank_app}
+    password: ${DB_PASSWORD:}
+  flyway:
+    table: flyway_customer_history   # one history table per service (they share one database)
+    baseline-on-migrate: true
+    baseline-version: 0          # so V1 still runs on a database that already has other services' tables
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate   # Flyway owns the schema; Hibernate only checks it matches the entities
     open-in-view: false
 eureka:
   client:
@@ -18,3 +23,15 @@ eureka:
       defaultZone: http://localhost:8761/eureka/
   instance:
     prefer-ip-address: true
+security:
+  jwt:
+    secret: ${JWT_SECRET:}      # must match the auth service and the gateway
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      probes:
+        enabled: true

@@ -21,11 +21,11 @@ pipeline {
         }
         stage('build') {
             steps {
-                echo 'build and test all five backend modules'
+                echo 'build all five backend modules and run their unit tests (a failing test stops the pipeline)'
                 dir('backend') {
                     bat 'mvn -B clean package'
                 }
-                echo '===== backend build finished, jars created ====='
+                echo '===== backend build and tests finished, jars created ====='
             }
         }
         stage('docker-images') {
@@ -59,6 +59,12 @@ pipeline {
                 bat 'kubectl get services'
                 echo '===== pipeline finished: run the port-forward commands to open the app ====='
             }
+        }
+    }
+    post {
+        always {
+            // unit test results from the build stage (shown on the build page in Jenkins)
+            junit allowEmptyResults: true, testResults: 'backend/*/target/surefire-reports/*.xml'
         }
     }
 }

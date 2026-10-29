@@ -14,7 +14,7 @@ public class SecurityConfig {
  @Bean SecurityFilterChain filterChain(HttpSecurity http)throws Exception{
   http.csrf(c->c.disable()).cors(c->c.configurationSource(req->{CorsConfiguration x=new CorsConfiguration();x.setAllowedOrigins(List.of("http://localhost:5173","http://127.0.0.1:5173"));x.setAllowedMethods(List.of("GET","POST","OPTIONS"));x.setAllowedHeaders(List.of("*"));x.setAllowCredentials(false);return x;}))
    .sessionManagement(s->s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-   .authorizeHttpRequests(a->a.requestMatchers("/auth/**","/error").permitAll().anyRequest().authenticated())
+   .authorizeHttpRequests(a->a.requestMatchers("/auth/**","/error","/actuator/health/**").permitAll().anyRequest().authenticated())
    .httpBasic(b->b.disable()).formLogin(f->f.disable());
   return http.build();
  }

@@ -3,13 +3,19 @@
 $ErrorActionPreference = 'Stop'
 $root = $PSScriptRoot
 
+# The services refuse to start without a JWT secret and the database password
+if (-not (Test-Path (Join-Path $root 'secrets.properties'))) {
+    Write-Error "backend\secrets.properties is missing. Copy secrets.properties.example to secrets.properties and fill it in."
+}
+
 # The project needs Java 17+, and Maven reads JAVA_HOME
 if (-not $env:JAVA_HOME -or -not (Test-Path (Join-Path $env:JAVA_HOME 'bin\java.exe'))) {
     Write-Error "JAVA_HOME is not set or is wrong. Point it at a JDK 17+, e.g.  `$env:JAVA_HOME = 'C:\Program Files\Java\jdk-17'"
 }
 
 function Start-Service([string]$module) {
-    $cmd = "`$Host.UI.RawUI.WindowTitle = '$module'; Set-Location '$root'; .\mvnw.cmd -pl $module spring-boot:run"
+    # "dev" profile = demo login (demo / Demo@123) and sample data. Secrets are read from backend\secrets.properties.
+    $cmd = "`$Host.UI.RawUI.WindowTitle = '$module'; Set-Location '$root'; .\mvnw.cmd -pl $module spring-boot:run '-Dspring-boot.run.profiles=dev'"
     Start-Process powershell -ArgumentList '-NoExit', '-Command', $cmd
     Write-Host "Started $module"
 }

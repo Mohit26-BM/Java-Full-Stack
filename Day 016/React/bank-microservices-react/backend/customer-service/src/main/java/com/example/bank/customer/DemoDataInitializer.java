@@ -6,9 +6,11 @@ import java.util.List;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
-/** The database is in memory, so these sample customers are recreated on every start. */
+/** Sample customers, inserted only when the "dev" profile is active and the table is empty. */
 @Configuration
+@Profile("dev")
 public class DemoDataInitializer {
 
     @Bean
