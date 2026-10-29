@@ -1,0 +1,25 @@
+# Maven / Java build output
+target/
+*.class
+*.jar
+.mvn/wrapper/maven-wrapper.jar
+
+# Node / front end
+node_modules/
+dist/
+*.tsbuildinfo
+*.local
+
+# Editors and tooling
+.metals/
+.bloop/
+.vscode/
+.idea/
+.classpath
+.project
+.settings/
+*.iml
+
+# Logs and local files
+*.log
+.env
