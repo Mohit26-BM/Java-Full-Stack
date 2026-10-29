@@ -1,8 +1,6 @@
 # CSB Training – Mohit
 
-Coursework from the NIIT Java Full Stack training program, by day: core Java, JDBC, Spring Boot, security, microservices, React, and DevOps (Docker, Kubernetes, Jenkins, testing). The course's banking project spec is `Progressive_Banking_Project_Description.pdf`; [`DOCUMENTATION_AUDIT.md`](DOCUMENTATION_AUDIT.md) records which folders have READMEs and what was left out.
-
-> READMEs here were written from reading the code; commands were **not run** unless a README says "verified". Config files in several projects contain default passwords or secrets, which the READMEs never repeat.
+Coursework from the NIIT Java Full Stack training program, by day: core Java, JDBC, Spring Boot, security, microservices, React, and DevOps (Docker, Kubernetes, Jenkins, testing).
 
 ## Start here
 | Project | Why |
