@@ -16,6 +16,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.example.demo.model.User;
@@ -35,11 +36,16 @@ public class UserControllerTest {
 	public void testPostUser() throws Exception{
 		User user1 = new User(100009L,"mohan","mohan@gmail.com");
 		//define
-		Mockito.when(service.insertUser(user1)).thenReturn(user1);
-		
+		Mockito.when(service.insertUser(Mockito.any(User.class))).thenReturn(user1);
+
 		// test
-		mockMvc.perform(post("/users/save"))
-				.andExpect(jsonPath("$[0].username",is("mohan")));
+		mockMvc.perform(post("/users/save")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{\"id\":100009,\"username\":\"mohan\",\"email\":\"mohan@gmail.com\"}"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.id",is(100009)))
+				.andExpect(jsonPath("$.username",is("mohan")))
+				.andExpect(jsonPath("$.email",is("mohan@gmail.com")));
 	}
 	
 	@Test
