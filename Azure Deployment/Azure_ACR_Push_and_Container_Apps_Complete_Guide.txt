@@ -1,0 +1,504 @@
+AZURE CONTAINER REGISTRY (ACR) + AZURE CONTAINER APPS
+COMPLETE STEP-BY-STEP GUIDE
+Windows PowerShell | Local Docker image -> Azure Container Registry -> Azure Container Apps
+
+OVERVIEW
+--------
+This guide explains how to:
+1. Prepare Docker and Azure CLI on a local Windows machine.
+2. Sign in to Azure.
+3. Create a resource group and Azure Container Registry (ACR).
+4. Build and test a Docker image locally.
+5. Tag and push the image to ACR.
+6. Configure a managed identity to pull the private image.
+7. Create an Azure Container Apps environment and run the image.
+8. Get the public URL, inspect logs, and deploy an update.
+9. Clean up resources to avoid ongoing charges.
+
+Azure Container Apps is used because it runs containers without requiring
+you to manage a virtual machine or Kubernetes cluster.
+
+IMPORTANT
+---------
+- Azure resources may incur charges. Check pricing and available credits.
+- ACR registry names must be globally unique and use lowercase letters/numbers.
+- Replace sample names, paths, and ports with your own values.
+- These commands are intended for Windows PowerShell.
+- Keep all steps in the same PowerShell session where variables are used.
+
+STEP 1 - PREREQUISITES
+---------------------
+You need:
+- An Azure subscription with permission to create resources.
+- Docker Desktop installed and running.
+- Azure CLI installed.
+- An application folder containing a working Dockerfile.
+
+Docker Desktop:
+https://www.docker.com/products/docker-desktop/
+
+Azure CLI for Windows:
+https://learn.microsoft.com/cli/azure/install-azure-cli-windows
+
+Verify Docker:
+    docker --version
+    docker info
+
+If docker info fails, start Docker Desktop and retry.
+
+Verify Azure CLI:
+    az version
+
+STEP 2 - SIGN IN TO AZURE
+-------------------------
+Sign in:
+    az login
+
+Review subscriptions:
+    az account show --output table
+    az account list --output table
+
+If you have multiple subscriptions, select the correct one:
+    az account set --subscription "<YOUR_SUBSCRIPTION_ID>"
+
+Confirm:
+    az account show --output table
+
+Install/update the Container Apps CLI extension:
+    az extension add --name containerapp --upgrade
+
+STEP 3 - DEFINE RESOURCE VARIABLES
+----------------------------------
+Run these commands in the same PowerShell window. Change the registry name
+to a globally unique name before continuing.
+
+    $LOCATION = "centralindia"
+    $RG = "csbresourcegroup"
+    $ACR = "csbcontainerregistry"
+    $IMAGE = "newrelicpython"
+    $TAG = "v1"
+    $APP = "csb-newrelicpython-app"
+    $ENV = "container-demo-env"
+    $IDENTITY = "container-demo-identity"
+
+Central India is an example region. Choose another supported region if needed.
+If the ACR name is taken, change $ACR, for example:
+    $ACR = "myuniqueacr20261030"
+
+STEP 4 - CREATE A RESOURCE GROUP
+--------------------------------
+    az group create `
+      --name $RG `
+      --location $LOCATION
+
+Verify:
+    az group show --name $RG --output table
+
+STEP 5 - CREATE AZURE CONTAINER REGISTRY
+----------------------------------------
+Create a Basic-tier registry with the admin account disabled:
+    az acr create `
+      --resource-group $RG `
+      --name $ACR `
+      --sku Basic `
+      --admin-enabled false
+
+Basic is a useful learning tier but is chargeable. Review current pricing.
+
+Verify:
+    az acr show `
+      --name $ACR `
+      --resource-group $RG `
+      --output table
+
+Retrieve the registry login server:
+    $LOGIN_SERVER = az acr show `
+      --name $ACR `
+      --query loginServer `
+      --output tsv
+
+Display it:
+    $LOGIN_SERVER
+
+Expected format (your value will differ):
+    praveendemoacr12345.azurecr.io
+
+Do not include https:// in the login server.
+
+STEP 6 - BUILD YOUR LOCAL DOCKER IMAGE
+--------------------------------------
+Open PowerShell in the folder containing your Dockerfile. Example:
+    cd C:\projects\myapp
+    dir
+
+Confirm the Dockerfile is present, then build:
+    docker build -t "${IMAGE}:${TAG}" .
+
+List images:
+    docker images
+
+Fix any Docker build errors before proceeding.
+
+Common internal application ports:
+- Spring Boot: often 8080
+- React static build served by NGINX: often 80
+- Flask: often 5000, depending on configuration
+
+The Azure target port must match the port the app listens on inside the
+container, not necessarily the host-side port.
+
+STEP 7 - TEST THE IMAGE LOCALLY
+-------------------------------
+Choose ONE example that matches your application.
+
+Option A - Spring Boot listens on port 8080 inside the container:
+    docker run -d --name myapp-local -p 8080:8080 "${IMAGE}:${TAG}"
+Open http://localhost:8080
+
+Option B - React served by NGINX listens on port 80 inside the container:
+    docker run -d --name myapp-local -p 8080:80 "${IMAGE}:${TAG}"
+Open http://localhost:8080
+
+Option C - App listens on port 5000 inside the container:
+    docker run -d --name myapp-local -p 8080:5000 "${IMAGE}:${TAG}"
+Open http://localhost:8080
+
+Check status and logs:
+    docker ps
+    docker logs myapp-local
+
+Configure required environment variables, databases, or dependent services
+before testing if your application needs them.
+
+After confirming it works, stop and remove the local test container:
+    docker stop myapp-local
+    docker rm myapp-local
+
+If the name is already in use, check docker ps -a and remove the old test
+container before reusing the name.
+
+STEP 8 - TAG THE IMAGE FOR ACR
+------------------------------
+ACR image format:
+    <registry-login-server>/<repository-name>:<tag>
+
+Set the full image name:
+    $FULL_IMAGE = "${LOGIN_SERVER}/${IMAGE}:${TAG}"
+    $FULL_IMAGE
+
+Expected format:
+    praveendemoacr12345.azurecr.io/myapp:v1
+
+   csbcontainerregistry.azurecr.io/relic-python-app:latest
+
+Tag the local image:
+    docker tag "${IMAGE}:${TAG}" $FULL_IMAGE
+
+Verify:
+    docker images
+
+STEP 9 - LOG IN TO ACR AND PUSH THE IMAGE
+-----------------------------------------
+Authenticate:
+    az acr login --name $ACR
+
+Push:
+    docker push $FULL_IMAGE
+
+List repositories:
+    az acr repository list `
+      --name $ACR `
+      --output table
+
+List tags for the repository:
+    az acr repository show-tags `
+      --name $ACR `
+      --repository $IMAGE `
+      --output table
+
+You should see v1. The image is now stored in ACR but is not running in Azure.
+
+If push fails:
+- Run az login and az acr login --name $ACR again.
+- Check registry name and login server.
+- Confirm your Azure identity has permission to push to the registry.
+- Confirm the repository/tag is correct.
+
+STEP 10 - SET UP MANAGED IDENTITY IMAGE-PULL PERMISSIONS
+--------------------------------------------------------
+The registry is private. Azure Container Apps needs permission to pull the
+image. This guide uses a user-assigned managed identity instead of a registry
+password in app configuration.
+
+10.1 Enable the ACR ARM audience authentication setting:
+    az acr config authentication-as-arm update `
+      --registry $ACR `
+      --status enabled
+
+10.2 Create a user-assigned managed identity:
+    az identity create `
+      --name $IDENTITY `
+      --resource-group $RG `
+      --location $LOCATION
+
+10.3 Retrieve identity and registry IDs:
+    $IDENTITY_ID = az identity show `
+      --name $IDENTITY `
+      --resource-group $RG `
+      --query id `
+      --output tsv
+
+    $PRINCIPAL_ID = az identity show `
+      --name $IDENTITY `
+      --resource-group $RG `
+      --query principalId `
+      --output tsv
+
+    $ACR_ID = az acr show `
+      --name $ACR `
+      --resource-group $RG `
+      --query id `
+      --output tsv
+
+10.4 Assign AcrPull at the registry scope:
+    az role assignment create `
+      --assignee-object-id $PRINCIPAL_ID `
+      --assignee-principal-type ServicePrincipal `
+      --scope $ACR_ID `
+      --role AcrPull
+
+This grants image-pull permission. Role assignments can take several minutes
+to propagate.
+
+Note: If the registry uses the newer "RBAC Registry + ABAC Repository
+Permissions" mode, repository access may require a different role, such as
+"Container Registry Repository Reader". Check the registry permission mode
+and assign the role appropriate to that mode.
+
+STEP 11 - CREATE A CONTAINER APPS ENVIRONMENT
+---------------------------------------------
+    az containerapp env create `
+      --name $ENV `
+      --resource-group $RG `
+      --location $LOCATION
+
+Wait for the command to finish successfully before proceeding.
+
+STEP 12 - CREATE AND RUN THE CONTAINER APP
+------------------------------------------
+Set the target port to the port inside your container. Choose only one:
+
+Spring Boot:
+    $TARGET_PORT = "8080"
+
+React served by NGINX:
+    $TARGET_PORT = "80"
+
+Flask listening on 5000:
+    $TARGET_PORT = "5000"
+
+Create the app:
+    az containerapp create `
+      --name $APP `
+      --resource-group $RG `
+      --environment $ENV `
+      --image $FULL_IMAGE `
+      --target-port $TARGET_PORT `
+      --ingress external `
+      --user-assigned $IDENTITY_ID `
+      --registry-identity $IDENTITY_ID `
+      --registry-server $LOGIN_SERVER
+
+This creates the Container App, pulls the private image using the managed
+identity, runs the container, and configures external HTTPS ingress.
+
+The target port must match the application's internal listening port.
+
+If a CLI parameter is reported as unknown:
+    az version
+    az extension add --name containerapp --upgrade
+
+Then check the current Container Apps CLI reference:
+https://learn.microsoft.com/cli/azure/containerapp
+
+STEP 13 - GET THE PUBLIC URL AND TEST
+-------------------------------------
+Get the fully qualified domain name:
+    $FQDN = az containerapp show `
+      --name $APP `
+      --resource-group $RG `
+      --query properties.configuration.ingress.fqdn `
+      --output tsv
+
+Create and display the URL:
+    $URL = "https://$FQDN"
+    $URL
+
+Open in the browser:
+    Start-Process $URL
+
+Or test:
+    Invoke-WebRequest $URL
+
+For a REST API, test a real endpoint. Example only:
+    Invoke-WebRequest "$URL/api/health"
+
+Replace /api/health with an endpoint that actually exists. A 404 at the
+root URL does not necessarily mean the container failed; the application
+may not define a route for /.
+
+STEP 14 - CHECK STATUS AND LOGS
+-------------------------------
+Show the Container App:
+    az containerapp show `
+      --name $APP `
+      --resource-group $RG `
+      --output table
+
+Show application console logs:
+    az containerapp logs show `
+      --name $APP `
+      --resource-group $RG `
+      --type console `
+      --tail 100
+
+Show system logs (useful for image-pull/startup problems):
+    az containerapp logs show `
+      --name $APP `
+      --resource-group $RG `
+      --type system `
+      --tail 100
+
+List revisions:
+    az containerapp revision list `
+      --name $APP `
+      --resource-group $RG `
+      --output table
+
+STEP 15 - DEPLOY A NEW VERSION
+------------------------------
+After changing the application, build and push a new version, for example v2.
+
+Set a new tag:
+    $TAG = "v2"
+    $FULL_IMAGE = "${LOGIN_SERVER}/${IMAGE}:${TAG}"
+
+Build, tag, authenticate, and push:
+    docker build -t "${IMAGE}:${TAG}" .
+    docker tag "${IMAGE}:${TAG}" $FULL_IMAGE
+    az acr login --name $ACR
+    docker push $FULL_IMAGE
+
+Update the existing Container App:
+    az containerapp update `
+      --name $APP `
+      --resource-group $RG `
+      --image $FULL_IMAGE
+
+Azure Container Apps deploys a new revision using the new image. Check logs
+and test the URL after the update.
+
+Recommended practices:
+- Use versioned tags such as v1, v2, v3.
+- Avoid relying only on the latest tag for production.
+- Record which image version was deployed.
+- Test new versions before sending production traffic to them.
+
+STEP 16 - TROUBLESHOOTING
+-------------------------
+ACR NAME ALREADY TAKEN
+- Choose another globally unique registry name.
+- Update $ACR and repeat registry creation.
+
+DOCKER DAEMON UNAVAILABLE
+- Start Docker Desktop.
+- Run docker info again.
+
+DOCKER PUSH UNAUTHORIZED
+- Run az login.
+- Run az acr login --name $ACR.
+- Confirm your Azure identity has push permission.
+
+CONTAINER APP CANNOT PULL THE IMAGE
+- Check $LOGIN_SERVER and $FULL_IMAGE.
+- Confirm repository and tag exist in ACR.
+- Confirm the app uses the intended managed identity.
+- Confirm the identity has the correct image-pull role.
+- Allow role assignments time to propagate.
+- Inspect system logs.
+
+CONTAINER STARTS BUT URL DOES NOT WORK
+- Confirm target port matches the internal listening port.
+- Confirm the application starts successfully.
+- For web apps, ensure the app binds to the correct interface (commonly
+  0.0.0.0 inside the container).
+- Inspect console logs and test a valid application route.
+
+CONTAINER RESTARTS REPEATEDLY
+- Inspect console logs.
+- Check environment variables, startup commands, database access, and
+  application configuration.
+- Reproduce the issue locally with docker run.
+
+ROOT URL RETURNS 404
+- Test a route that exists in the app.
+- Confirm the app is listening on the expected port.
+
+STEP 17 - CLEAN UP TO AVOID ONGOING CHARGES
+-------------------------------------------
+When the demo is no longer needed, delete the resource group:
+    az group delete `
+      --name $RG `
+      --yes `
+      --no-wait
+
+WARNING: This deletes every resource inside the group, including the
+Container App, environment, Container Registry, and managed identity created
+for this exercise. Do not run this if the group contains resources you need.
+
+Review resources first:
+    az resource list --resource-group $RG --output table
+
+ARCHITECTURE SUMMARY
+--------------------
+1. Developer writes code on the local Windows machine.
+2. Docker builds the application into an image.
+3. Developer tests the image locally.
+4. Developer tags the image with the ACR login server.
+5. Docker pushes the image to Azure Container Registry.
+6. A managed identity allows Container Apps to pull the private image.
+7. Azure Container Apps runs the container.
+8. External ingress provides an HTTPS URL.
+9. Logs and revisions support troubleshooting and updates.
+
+Local machine:
+    Source code -> Docker build -> Local Docker image
+                                      |
+                                      | docker push
+                                      v
+Azure Container Registry:
+    Private repository: myapp:v1
+                                      |
+                                      | Pull using managed identity
+                                      v
+Azure Container Apps:
+    Running container -> HTTPS endpoint
+
+OFFICIAL MICROSOFT DOCUMENTATION
+--------------------------------
+Azure CLI installation:
+https://learn.microsoft.com/cli/azure/install-azure-cli-windows
+
+Azure Container Registry quickstart:
+https://learn.microsoft.com/azure/container-registry/container-registry-get-started-azure-cli
+
+Azure Container Apps:
+https://learn.microsoft.com/azure/container-apps/
+
+Managed identity image pulls:
+https://learn.microsoft.com/azure/container-apps/managed-identity-image-pull
+
+Azure Container Apps CLI reference:
+https://learn.microsoft.com/cli/azure/containerapp
+
+END OF GUIDE
