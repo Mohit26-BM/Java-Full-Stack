@@ -21,14 +21,18 @@ pipeline {
         stage('build') {
             steps {
                 echo 'create a jar file from the code'
-                bat 'mvn clean install'
+                dir('Jenkins Work') {
+                    bat 'mvn clean install'
+                }
                 echo '===== build finished, jar created ====='
             }
         }
         stage('docker-image') {
             steps {
                 echo 'create a docker image'
-                bat 'docker build -t ci-cd-pipeline-image .'
+                dir('Jenkins Work') {
+                    bat 'docker build -t ci-cd-pipeline-image .'
+                }
                 echo '===== docker image built ====='
             }
         }
