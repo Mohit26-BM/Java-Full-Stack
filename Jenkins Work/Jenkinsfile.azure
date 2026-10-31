@@ -74,10 +74,11 @@ pipeline {
         stage('deploy to azure') {
             steps {
                 bat '''
+                rem az is a .cmd file: without "call" the script would stop after the first az line
                 for /f "delims=" %%i in ('az identity show --name %IDENTITY% --resource-group %RG% --query id --output tsv') do set IDENTITY_ID=%%i
-                az containerapp registry set --name %APP% --resource-group %RG% --server %ACR_NAME%.azurecr.io --identity %IDENTITY_ID%
-                az containerapp ingress update --name %APP% --resource-group %RG% --target-port 8080
-                az containerapp update --name %APP% --resource-group %RG% --image %ACR_NAME%.azurecr.io/%IMAGE%:%BUILD_NUMBER% --set-env-vars APP_VERSION=%BUILD_NUMBER%
+                call az containerapp registry set --name %APP% --resource-group %RG% --server %ACR_NAME%.azurecr.io --identity %IDENTITY_ID% || exit /b 1
+                call az containerapp ingress update --name %APP% --resource-group %RG% --target-port 8080 || exit /b 1
+                call az containerapp update --name %APP% --resource-group %RG% --image %ACR_NAME%.azurecr.io/%IMAGE%:%BUILD_NUMBER% --set-env-vars APP_VERSION=%BUILD_NUMBER% || exit /b 1
                 '''
             }
         }
