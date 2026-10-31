@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class HelloController {
 
-	@GetMapping("/")
-	public String home() {
+	@GetMapping("/welcome")
+	public String welcome() {
 		return "Welcome to the CI/CD Demo Pipeline!";
 	}
 

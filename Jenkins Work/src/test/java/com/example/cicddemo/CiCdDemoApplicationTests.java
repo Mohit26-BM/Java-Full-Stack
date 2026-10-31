@@ -18,6 +18,11 @@ class CiCdDemoApplicationTests {
 	}
 
 	@Test
+	void infoReportsAVersion() throws Exception {
+		assertEquals(true, new InfoController().info().containsKey("version"));
+	}
+
+	@Test
 	void greetUsesTheGivenName() {
 		assertEquals("Hello, Mohit!", new HelloController().greet("Mohit"));
 	}

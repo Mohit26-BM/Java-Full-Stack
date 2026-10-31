@@ -40,7 +40,7 @@ pipeline {
             steps {
                 echo 'create a container to run the image'
                 bat 'docker rm -f ci-cd-pipeline-demo >nul 2>&1 & exit /b 0'
-                bat 'docker run -dit --name ci-cd-pipeline-demo -p 9091:8080 ci-cd-pipeline-image'
+                bat 'docker run -dit --name ci-cd-pipeline-demo -e APP_VERSION=%BUILD_NUMBER% -p 9091:8080 ci-cd-pipeline-image'
                 echo '===== container started on http://localhost:9091 ====='
             }
         }
