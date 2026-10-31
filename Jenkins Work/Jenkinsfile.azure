@@ -15,6 +15,7 @@ pipeline {
         DOCKER_CONFIG = "${env.WORKSPACE}\\.docker"
         // reuse the containerapp extension that is already installed for your user
         AZURE_EXTENSION_DIR = 'C:\\Users\\mbmoh\\.azure\\cliextensions'
+        DOCKER_BUILDKIT = '1'
 
         // must match 4_jenkins_azure_setup.txt
         RG = 'Mohit-rg'
@@ -44,6 +45,8 @@ pipeline {
         }
         stage('docker image') {
             steps {
+                // DOCKER_CONFIG hides Docker's plugins, so point it at buildx: the legacy builder makes images Azure rejects
+                writeFile file: '.docker/config.json', text: '{"cliPluginsExtraDirs":["C:/Users/mbmoh/AppData/Local/Programs/DockerDesktop/resources/cli-plugins"]}'
                 dir('Jenkins Work') {
                     // tag with the build number so every deployment is traceable
                     bat 'docker build -t %ACR_NAME%.azurecr.io/%IMAGE%:%BUILD_NUMBER% .'
@@ -75,8 +78,7 @@ pipeline {
             steps {
                 bat '''
                 rem az is a .cmd file: without "call" the script would stop after the first az line
-                for /f "delims=" %%i in ('az identity show --name %IDENTITY% --resource-group %RG% --query id --output tsv') do set IDENTITY_ID=%%i
-                call az containerapp registry set --name %APP% --resource-group %RG% --server %ACR_NAME%.azurecr.io --identity %IDENTITY_ID% || exit /b 1
+                rem the registry login (managed identity) is set when the app is created, see 4_jenkins_azure_setup.txt
                 call az containerapp ingress update --name %APP% --resource-group %RG% --target-port 8080 || exit /b 1
                 call az containerapp update --name %APP% --resource-group %RG% --image %ACR_NAME%.azurecr.io/%IMAGE%:%BUILD_NUMBER% --set-env-vars APP_VERSION=%BUILD_NUMBER% || exit /b 1
                 '''

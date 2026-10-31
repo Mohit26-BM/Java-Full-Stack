@@ -29,6 +29,8 @@ Start-Sleep -Seconds 60
 # the pause lets the role assignments take effect
 
 # ---- Block 4: environment and a placeholder app (Jenkins replaces the image on its first run) ----
+# the registry login (managed identity) MUST be given here, when the app is created:
+# adding it later with "az containerapp registry set" did not take effect
 az containerapp env create --name $ENVNAME --resource-group $RG --location $LOCATION
 
 az containerapp create `
@@ -38,7 +40,9 @@ az containerapp create `
   --image mcr.microsoft.com/k8se/quickstart:latest `
   --target-port 80 `
   --ingress external `
-  --user-assigned $IDENTITY_ID
+  --user-assigned $IDENTITY_ID `
+  --registry-identity $IDENTITY_ID `
+  --registry-server "$ACR.azurecr.io"
 # expect: JSON ending with "type": "Microsoft.App/containerApps"
 
 # ---- Block 5: check ----
