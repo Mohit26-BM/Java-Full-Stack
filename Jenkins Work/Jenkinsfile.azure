@@ -65,7 +65,10 @@ pipeline {
         stage('push to registry') {
             steps {
                 bat 'az acr login --name %ACR_NAME%'
-                bat 'docker push %ACR_NAME%.azurecr.io/%IMAGE%:%BUILD_NUMBER%'
+                // a dropped connection mid-upload is common on the first push; layers already sent are kept
+                retry(3) {
+                    bat 'docker push %ACR_NAME%.azurecr.io/%IMAGE%:%BUILD_NUMBER%'
+                }
             }
         }
         stage('deploy to azure') {
