@@ -1,0 +1,48 @@
+# ONE-TIME AZURE SETUP for the Jenkins pipeline (Jenkins Work/Jenkinsfile.azure)
+# Creates the registry, a managed identity, a Container Apps environment and a placeholder app.
+# The pipeline then only pushes new images and updates the app.
+# Use Windows PowerShell. Run it as yourself (Owner): the Jenkins service principal cannot assign roles.
+# Cost: about $0.17/day for the registry; the app is almost free. Delete with 3_cleanup_commands.txt when finished.
+
+# ---- Block 1: names (these must match the environment block in Jenkinsfile.azure) ----
+$LOCATION = "centralindia"
+$RG = "Mohit-rg"
+$ACR = "mohitcicdacr"
+$IDENTITY = "mohit-cicd-identity"
+$ENVNAME = "mohit-cicd-env"
+$APP = "mohit-cicd-app"
+$JENKINS_SP_APPID = "e9ac9e32-2ec5-4799-90d2-3ac9556cd45e"
+
+# ---- Block 2: registry and identity ----
+az acr create --resource-group $RG --name $ACR --location $LOCATION --sku Basic --admin-enabled false
+az acr config authentication-as-arm update --registry $ACR --status enabled
+az identity create --name $IDENTITY --resource-group $RG --location $LOCATION
+$IDENTITY_ID = az identity show --name $IDENTITY --resource-group $RG --query id --output tsv
+$PRINCIPAL_ID = az identity show --name $IDENTITY --resource-group $RG --query principalId --output tsv
+$ACR_ID = az acr show --name $ACR --resource-group $RG --query id --output tsv
+
+# ---- Block 3: permissions ----
+# the app's identity may pull images; the Jenkins service principal may push them
+az role assignment create --assignee-object-id $PRINCIPAL_ID --assignee-principal-type ServicePrincipal --scope $ACR_ID --role AcrPull
+az role assignment create --assignee $JENKINS_SP_APPID --role AcrPush --scope $ACR_ID
+Start-Sleep -Seconds 60
+# the pause lets the role assignments take effect
+
+# ---- Block 4: environment and a placeholder app (Jenkins replaces the image on its first run) ----
+az containerapp env create --name $ENVNAME --resource-group $RG --location $LOCATION
+
+az containerapp create `
+  --name $APP `
+  --resource-group $RG `
+  --environment $ENVNAME `
+  --image mcr.microsoft.com/k8se/quickstart:latest `
+  --target-port 80 `
+  --ingress external `
+  --user-assigned $IDENTITY_ID
+# expect: JSON ending with "type": "Microsoft.App/containerApps"
+
+# ---- Block 5: check ----
+az resource list --resource-group $RG --output table
+$FQDN = az containerapp show --name $APP --resource-group $RG --query properties.configuration.ingress.fqdn --output tsv
+"https://$FQDN"
+# expect: the quickstart page in a browser (Azure's sample, not your app yet)

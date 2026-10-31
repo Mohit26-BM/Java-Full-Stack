@@ -1,0 +1,96 @@
+pipeline {
+    agent any
+
+    tools {
+        maven 'maven3'
+        jdk 'JDK17'
+    }
+
+    environment {
+        // Jenkins runs as LocalSystem, so it needs the tool folders on PATH
+        PATH = "C:\\Users\\mbmoh\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin;C:\\Program Files\\Microsoft SDKs\\Azure\\CLI2\\wbin;${env.PATH}"
+
+        // keep the Azure and Docker logins inside this job's workspace
+        AZURE_CONFIG_DIR = "${env.WORKSPACE}\\.azure"
+        DOCKER_CONFIG = "${env.WORKSPACE}\\.docker"
+        // reuse the containerapp extension that is already installed for your user
+        AZURE_EXTENSION_DIR = 'C:\\Users\\mbmoh\\.azure\\cliextensions'
+
+        // must match 4_jenkins_azure_setup.txt
+        RG = 'Mohit-rg'
+        ACR_NAME = 'mohitcicdacr'
+        APP = 'mohit-cicd-app'
+        IDENTITY = 'mohit-cicd-identity'
+        IMAGE = 'ci-cd-demo-pipeline'
+    }
+
+    stages {
+        stage('checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        stage('build and test') {
+            steps {
+                dir('Jenkins Work') {
+                    bat 'mvn clean install'
+                }
+            }
+            post {
+                always {
+                    junit 'Jenkins Work/target/surefire-reports/*.xml'
+                }
+            }
+        }
+        stage('docker image') {
+            steps {
+                dir('Jenkins Work') {
+                    // tag with the build number so every deployment is traceable
+                    bat 'docker build -t %ACR_NAME%.azurecr.io/%IMAGE%:%BUILD_NUMBER% .'
+                }
+            }
+        }
+        stage('azure login') {
+            steps {
+                // single quotes: Jenkins masks the secret and Groovy never sees it
+                withCredentials([
+                    usernamePassword(credentialsId: 'azure-sp', usernameVariable: 'AZ_CLIENT_ID', passwordVariable: 'AZ_CLIENT_SECRET'),
+                    string(credentialsId: 'azure-tenant-id', variable: 'AZ_TENANT_ID')
+                ]) {
+                    bat 'az login --service-principal --username %AZ_CLIENT_ID% --password %AZ_CLIENT_SECRET% --tenant %AZ_TENANT_ID% --output none'
+                }
+                bat 'az account show --query name --output tsv'
+            }
+        }
+        stage('push to registry') {
+            steps {
+                bat 'az acr login --name %ACR_NAME%'
+                bat 'docker push %ACR_NAME%.azurecr.io/%IMAGE%:%BUILD_NUMBER%'
+            }
+        }
+        stage('deploy to azure') {
+            steps {
+                bat '''
+                for /f "delims=" %%i in ('az identity show --name %IDENTITY% --resource-group %RG% --query id --output tsv') do set IDENTITY_ID=%%i
+                az containerapp registry set --name %APP% --resource-group %RG% --server %ACR_NAME%.azurecr.io --identity %IDENTITY_ID%
+                az containerapp ingress update --name %APP% --resource-group %RG% --target-port 8080
+                az containerapp update --name %APP% --resource-group %RG% --image %ACR_NAME%.azurecr.io/%IMAGE%:%BUILD_NUMBER% --set-env-vars APP_VERSION=%BUILD_NUMBER%
+                '''
+            }
+        }
+        stage('smoke test') {
+            steps {
+                // wait until the public URL reports this build number
+                bat '''
+                powershell -NoProfile -Command "$fqdn = az containerapp show --name %APP% --resource-group %RG% --query properties.configuration.ingress.fqdn --output tsv; for ($i = 0; $i -lt 18; $i++) { try { $v = (Invoke-RestMethod ('https://' + $fqdn + '/api/info')).version; if ($v -eq '%BUILD_NUMBER%') { Write-Host ('OK: build ' + $v + ' is live at https://' + $fqdn); exit 0 } } catch {}; Start-Sleep -Seconds 10 }; Write-Host 'Smoke test failed: the new build did not appear'; exit 1"
+                '''
+            }
+        }
+    }
+
+    post {
+        always {
+            bat 'az logout & exit /b 0'
+        }
+    }
+}
