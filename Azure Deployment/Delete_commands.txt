@@ -1,9 +1,0 @@
-
-az containerapp delete --name mohit-demo-app --resource-group Mohit-rg --yes
-az containerapp env delete --name mohit-demo-env --resource-group Mohit-rg --yes
-az acr delete --name mohitdemoacr18702 --resource-group Mohit-rg --yes
-az identity delete --name mohit-demo-identity --resource-group Mohit-rg
-
-az resource list --resource-group Mohit-rg --output table
-
-az monitor log-analytics workspace delete --workspace-name <name from the table> --resource-group Mohit-rg --yes

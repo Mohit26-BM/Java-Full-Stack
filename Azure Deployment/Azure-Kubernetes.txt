@@ -1,0 +1,343 @@
+AZURE KUBERNETES SERVICE (AKS) — COMPLETE WINDOWS POWERSHELL GUIDE
+Deploy: csbcontainerregistry.azurecr.io/python-flask-image:latest
+Target: 2 AKS worker nodes, 2 Flask pod replicas, public load-balanced URL
+
+IMPORTANT COST WARNING
+---------------------
+AKS is not automatically free just because an Azure subscription has a free offer.
+The AKS cluster management tier may have a free option, but worker-node VMs, the
+Azure Load Balancer/public IP, and other resources can incur charges. Check pricing
+and your subscription quota before running the create command. Delete the resources
+when finished if you do not want ongoing charges.
+
+YOUR EXISTING AZURE DETAILS
+---------------------------
+Tenant ID:                 6cfd01b9-0bed-4c55-9ecd-3f5fe5ea1b89
+Subscription ID:           08e8df8d-de77-4718-9561-c205763de3ea
+Subscription name:         praveentechtutorials
+Resource group:            csbresourcegroup
+Existing Container Apps Environment: container-demo-env (NOT used by AKS)
+Existing Container App:    csbazurecontainer (NOT used by AKS)
+Azure Container Registry:  csbcontainerregistry
+Image:                     csbcontainerregistry.azurecr.io/azure-springboot-rest:latest
+Flask container port:      8081
+
+This creates a NEW AKS cluster. Azure Container Apps resources are separate from AKS;
+the existing Container App and its environment are not converted or reused by AKS.
+
+ASSUMPTIONS
+-----------
+- Run these commands in Windows PowerShell (not Command Prompt).
+- Azure CLI is installed and you can sign in.
+- The ACR is in the subscription above.
+- Flask listens on 0.0.0.0:8080 inside the image.
+- Cluster name: csb-aks-cluster
+- AKS region will be read from the existing ACR's region to avoid an unnecessary
+  cross-region registry pull. If that region lacks quota/capacity, choose another
+  supported region and consider the network/transfer implications.
+- VM size below is Standard_D2s_v5, a common general-purpose size, NOT a promise
+  of free-tier eligibility. Change it only after checking available VM sizes, quota,
+  and pricing for your region/subscription.
+
+STEP 1 — SIGN IN AND SELECT YOUR SUBSCRIPTION
+---------------------------------------------
+Open PowerShell and run:
+
+az login --tenant 6cfd01b9-0bed-4c55-9ecd-3f5fe5ea1b89
+
+az account set --subscription 08e8df8d-de77-4718-9561-c205763de3ea
+
+az account show --output table
+
+Confirm the displayed subscription is praveentechtutorials.
+
+STEP 2 — DEFINE VARIABLES AND READ THE ACR REGION
+-------------------------------------------------
+Copy and run this PowerShell block:
+
+$RG = "csbresourcegroup"
+$AKS = "csb-aks-cluster"
+$ACR = "csbcontainerregistry"
+$IMAGE = "csbcontainerregistry.azurecr.io/azure-springboot-rest:latest"
+
+$LOCATION = az acr show --name $ACR --resource-group $RG --query location --output tsv
+Write-Host "AKS region selected from ACR: $LOCATION"
+
+If the ACR is not in csbresourcegroup, find its resource group first:
+az acr show --name csbcontainerregistry --query "{ResourceGroup:resourceGroup,Location:location,LoginServer:loginServer}" --output table
+
+If it is in a different resource group, update $RG for the AKS cluster's resource group
+and use the ACR's actual resource group in the ACR commands. The AKS cluster and ACR
+must be in the same subscription for the simple --attach-acr flow.
+
+STEP 3 — VERIFY THAT THE IMAGE EXISTS
+-------------------------------------
+az acr repository show --name $ACR --repository python-flask-image --output table
+
+az acr repository show-tags --name $ACR --repository python-flask-image --output table
+
+Confirm that the "latest" tag exists. If the image is missing, push it to ACR before
+continuing.
+
+STEP 4 — REGISTER REQUIRED RESOURCE PROVIDERS
+---------------------------------------------
+Run:
+
+az provider register --namespace Microsoft.ContainerService
+az provider register --namespace Microsoft.Compute
+az provider register --namespace Microsoft.Network
+az provider register --namespace Microsoft.ManagedIdentity
+
+Check registration (repeat until Registered if needed):
+
+az provider show --namespace Microsoft.ContainerService --query registrationState --output tsv
+
+STEP 5 — CREATE THE RESOURCE GROUP IF IT DOES NOT EXIST
+-------------------------------------------------------
+The commands below use your existing resource group:
+
+az group show --name $RG --output table
+
+If it does not exist, create it in the chosen region:
+
+az group create --name $RG --location $LOCATION
+
+Do not create a duplicate group if it already exists.
+
+STEP 6 — CREATE A NEW AKS CLUSTER WITH TWO WORKER NODES
+-------------------------------------------------------
+This can take several minutes. It creates billable Azure resources.
+
+az aks create `
+  --resource-group $RG `
+  --name $AKS `
+  --location $LOCATION `
+  --node-count 2 `
+  --node-vm-size Standard_D2s_v5 `
+  --generate-ssh-keys `
+  --attach-acr $ACR `
+  --tier free `
+  --enable-managed-identity `
+  --output table
+
+Notes:
+- --node-count 2 requests two worker nodes in the default node pool.
+- --attach-acr configures the AKS identity to pull images from the existing ACR.
+  You need sufficient permissions to create the cluster and assign the AcrPull role.
+- --tier free refers to the AKS cluster management tier; it does NOT make the
+  worker VMs, Load Balancer, public IP, disks, or networking free.
+- Standard_D2s_v5 is only an example size. If creation fails due to quota or regional
+  capacity, check your subscription's vCPU quota and Azure's supported VM sizes.
+  Do not repeatedly retry a size that your subscription cannot allocate.
+- If you already have an AKS cluster named csb-aks-cluster, choose another name or
+  inspect the existing cluster before creating anything.
+
+If --attach-acr fails due to role-assignment permissions, ask a subscription
+administrator/Owner or User Access Administrator to grant the required AcrPull role
+to the AKS kubelet managed identity, then retry/complete the integration.
+
+STEP 7 — INSTALL KUBECTL AND CONNECT TO THE CLUSTER
+--------------------------------------------------
+az aks install-cli
+
+az aks get-credentials --resource-group $RG --name $AKS --overwrite-existing
+
+Verify the cluster connection and nodes:
+
+kubectl config current-context
+kubectl get nodes -o wide
+
+Expected: two nodes, each with STATUS Ready. Do not proceed until both nodes are Ready.
+
+STEP 8 — CREATE A KUBERNETES DEPLOYMENT WITH TWO REPLICAS
+---------------------------------------------------------
+The deployment below:
+- Uses the exact image requested.
+- Creates two pod replicas.
+- Exposes container port 8080.
+- Adds a topology spread constraint so the two pods are distributed across distinct
+  nodes when both nodes are Ready and eligible. If scheduling cannot satisfy this
+  rule, a pod may remain Pending; inspect the events rather than removing the rule
+  without understanding the cause.
+
+Create the YAML file from PowerShell:
+
+@'
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: springboot-rest-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: springboot-rest
+  template:
+    metadata:
+      labels:
+        app: springboot-rest
+    spec:
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app: springboot-rest
+      containers:
+        - name: springboot-rest
+          image: csbcontainerregistry.azurecr.io/azure-springboot-rest:latest
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8081
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: springboot-rest-loadbalancer
+spec:
+  type: LoadBalancer
+  selector:
+    app: springboot-rest
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8081
+      protocol: TCP
+'@ | Set-Content -Path .\springboot-rest-aks.yaml -Encoding utf8
+
+Review the file if desired:
+
+notepad .\python-flask-aks.yaml
+
+STEP 9 — DEPLOY THE YAML
+------------------------
+kubectl apply -f .\springboot-rest-aks.yaml
+
+Wait for rollout completion:
+
+kubectl rollout status deployment/springboot-rest-deployment --timeout=5m
+
+STEP 10 — VERIFY TWO PODS ARE RUNNING ON TWO DIFFERENT NODES
+------------------------------------------------------------
+kubectl get deployment springboot-rest-deployment
+kubectl get pods -l app=py -o wide
+kubectl get nodes -o wide
+
+Check:
+- READY on the deployment should be 2/2.
+- Both pods should show STATUS Running.
+- In the pod listing, compare the NODE column: the two pods should be on different
+  node names if both nodes are Ready and schedulable.
+- If a pod is Pending, inspect:
+  kubectl describe pods -l app=python-flask
+- If a pod is in ImagePullBackOff or ErrImagePull, inspect:
+  kubectl describe pods -l app=python-flask
+  Confirm the image tag exists and ACR pull permission is configured.
+- If a pod is CrashLoopBackOff, inspect logs:
+  kubectl logs deployment/python-flask-deployment --all-pods=true
+  If your kubectl version does not support --all-pods, get the pod name with
+  kubectl get pods -l app=python-flask and run kubectl logs <pod-name>.
+
+STEP 11 — GET THE PUBLIC LOAD-BALANCED URL
+------------------------------------------
+Check the service:
+
+kubectl get service python-flask-loadbalancer --watch
+
+Wait until EXTERNAL-IP shows an IP address instead of <pending>. Press Ctrl+C after
+the IP appears.
+
+Or retrieve the IP directly:
+
+$PUBLICIP = kubectl get service python-flask-loadbalancer -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+Write-Host "Public service IP: $PUBLICIP"
+Write-Host "Try URL: http://$PUBLICIP"
+
+Open http://<EXTERNAL-IP> in your browser. The service listens publicly on port 80
+and forwards traffic to container port 8080.
+
+If the external IP is blank or pending, wait a few minutes and check again:
+kubectl get service python-flask-loadbalancer
+kubectl describe service python-flask-loadbalancer
+
+IMPORTANT: The root path "/" must be implemented by your Flask application to show
+a page at the base URL. If the app exposes only a path such as /hello or /api, use
+http://<EXTERNAL-IP>/hello or the actual route defined in your code. A 404 at "/" can
+mean the application is reachable but that route is not defined.
+
+STEP 12 — CHECK LOGS AND TROUBLESHOOT
+-------------------------------------
+List Kubernetes objects:
+
+kubectl get deployments
+kubectl get pods -o wide
+kubectl get services
+
+Read a pod's logs:
+
+kubectl get pods -l app=python-flask
+kubectl logs <POD_NAME>
+
+Describe a pod to see image-pull errors, scheduling problems, or restarts:
+
+kubectl describe pod <POD_NAME>
+
+Check recent events:
+
+kubectl get events --sort-by=.metadata.creationTimestamp
+
+Restart the deployment if you have made a change and need to restart the pods:
+
+kubectl rollout restart deployment/python-flask-deployment
+kubectl rollout status deployment/python-flask-deployment --timeout=5m
+
+If you push a new image but keep the same "latest" tag, Kubernetes image caching can
+make troubleshooting confusing. Prefer publishing a unique version tag and updating
+the deployment to that tag for repeatable deployments.
+
+STEP 13 — SCALE REPLICAS OR CHECK THEM
+--------------------------------------
+Set the replica count to two:
+
+kubectl scale deployment/python-flask-deployment --replicas=2
+
+Confirm:
+
+kubectl get deployment python-flask-deployment
+kubectl get pods -l app=python-flask -o wide
+
+STEP 14 — CLEAN UP TO AVOID CONTINUING COSTS
+--------------------------------------------
+WARNING: The following command deletes the AKS cluster and its associated cluster
+resources. It does not delete the separate resource group or the ACR when they are
+in csbresourcegroup, but it deletes the cluster's managed node resource group and
+the resources in it. Review before executing.
+
+az aks delete --name csb-aks-cluster --resource-group csbresourcegroup --yes
+
+If you no longer need the public LoadBalancer, deleting the AKS cluster removes its
+cluster resources. Confirm in the Azure portal that billable resources are gone.
+Do NOT delete csbresourcegroup if it contains your existing ACR or Container Apps
+unless you intentionally want to delete those resources too.
+
+USEFUL REFERENCES
+-----------------
+Microsoft Learn — AKS quickstart with Azure CLI:
+https://learn.microsoft.com/en-us/azure/aks/learn/quick-kubernetes-deploy-cli
+
+Microsoft Learn — Integrate ACR with AKS:
+https://learn.microsoft.com/en-us/azure/aks/cluster-container-registry-integration
+
+Microsoft Learn — Deploy an application to AKS:
+https://learn.microsoft.com/en-us/azure/aks/tutorial-kubernetes-deploy-application
+
+END OF GUIDE
